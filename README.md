@@ -47,6 +47,20 @@ est 30 minutes
 CSS Structuring
 est 30 minutes
 
-JS for base site (element (re)positioning and displaying info from beat/genre detection alos)
+JS for base site
 est 30 minutes
 
+Retrieving MP3 algo
+est 120 minutes
+
+Analyze MP3 BPM algo
+est 360 minutes
+
+Genre label check algo
+est 120 minutes
+
+Genre bpm check algo
+90 minutes
+
+total time
+13 hours = 780 minutes
