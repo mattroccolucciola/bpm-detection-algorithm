@@ -41,26 +41,12 @@ PMVP
 
 TIMELINE
 
-HTML design
-est 30 minutes
-
-CSS Structuring
-est 30 minutes
-
-JS for base site
-est 30 minutes
-
-Retrieving MP3 algo
-est 120 minutes
-
-Analyze MP3 BPM algo
-est 360 minutes
-
-Genre label check algo
-est 120 minutes
-
-Genre bpm check algo
-90 minutes
-
-total time
-13 hours = 780 minutes
+| Component        | Priority | Estimated Time | Time Invested | Time ∆   |
+| :-------------:  | :------: | :------------: | :-----------: | :------: |
+| HTML Design      |    L     |    30 Min      |    20 min     | -10 min  |
+| CSS Structuring  |    L     |    30 Min      |     0 min     | |
+| JS for base site |    L     |    30 Min      |     0 min     | |
+| Pull MP3 - algo  |    H     |   120 Min      |    10 min     | |
+| Analyze BPM algo |    H     |   360 Min      |     0 min     | |
+| Genre label algo |    L     |   120 Min      |     0 min     | |
+| Genre BPM algo   |    L     |    90 Min      |     0 min     | |
