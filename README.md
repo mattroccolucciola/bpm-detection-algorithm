@@ -46,7 +46,7 @@ TIMELINE
 | HTML Design      |    L     |    30 Min      |    20 min     | -10 min  |
 | CSS Structuring  |    L     |    30 Min      |    15 min     | |
 | JS for base site |    L     |    30 Min      |     0 min     | |
-| Pull MP3 - algo  |    H     |   120 Min      |   175 min     | |
-| Analyze BPM algo |    H     |   360 Min      |     0 min     | |
+| Pull MP3 - algo  |    H     |   120 Min      |   355 min     | |
+| Analyze BPM algo |    H     |   360 Min      |   120 min     | |
 | Genre label algo |    L     |   120 Min      |     0 min     | |
 | Genre BPM algo   |    L     |    90 Min      |     0 min     | |
