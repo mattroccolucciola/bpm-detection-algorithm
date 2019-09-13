@@ -1,5 +1,54 @@
 track_id = 170734376;
 CLIENT_ID = '6aSX01kZxpetA85mf5R9Ezqs3ozjO2zc';
+AudioContext = window.AudioContext || window.webkitAudioContext;
+OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
+audioCtx = new AudioContext();
+
+// main function
+function main() {
+    let submitButton = document.querySelector('#getURL');
+
+    // the entire script basically needs to be assigned to the submit button
+    submitButton.addEventListener('click', getMP3AndFindBPM)
+}
+main()
+
+// full function
+async function getMP3AndFindBPM(event) {
+    // prevent default
+    event.preventDefault();
+
+    // get the mp3 path
+    mp3URL = await getMP3Path();
+
+    // analyze the bpm
+    //mp3URL = './waiting-so-long.mp3'
+    analyzeSongBPM(mp3URL);
+};
+
+// get the mp3
+async function getMP3Path() {
+    // delete this line, its for testing only
+    //document.querySelector('#url').value = 'https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix';
+    // document.querySelector('#url').value = 'https://soundcloud.com/skrillex/skrillex-feat-beam-mumbai-power';
+    //document.querySelector('#url').value = 'https://soundcloud.com/skrillex/skrillex-feat-alvin-risk-fuji-opener';
+    //document.querySelector('#url').value = 'https://soundcloud.com/skrillex/skrillex-bangarang-feat-sirah';
+    // document.querySelector('#url').value = 'https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long';
+
+    // get the text from the input field
+    let trackURL = mungUserInput()
+    if (trackURL === '') {
+        alert('please enter valid url');
+    }
+
+    // get the track id via the main url
+    let fullUrl = `https://api.soundcloud.com/resolve?url=${trackURL}&client_id=${CLIENT_ID}`
+
+    // mung the page source, get the url for making api call
+    streamData = await pullMp3URL(fullUrl);
+    MP3Path = streamData['request']['responseURL']
+    return MP3Path
+}
 
 // process input from user and parse & clean it
 function mungUserInput() {
@@ -19,230 +68,169 @@ function mungUserInput() {
 }
 
 // get the asset from servers
-async function pullMp3(url) {
+async function pullMp3URL(url) {
     info = await axios.get(url);
     streamURL = info['data']['stream_url'] + `?client_id=${CLIENT_ID}`;
     return await axios.get(streamURL);
-    return streamData['request']['responseURL'];
 }
 
-// get the mp3
-async function getMP3Path () {
-    // delete this line, its for testing only
-    document.querySelector('#url').value = 'https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix';
-    // document.querySelector('#url').value = 'https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long';
-
-    // get the text from the input field
-    let trackURL = mungUserInput()
-
-    // get the track id via the main url
-    let fullUrl = `https://api.soundcloud.com/resolve?url=${trackURL}&client_id=${CLIENT_ID}`
-
-    // mung the page source, get the url for making api call
-    streamData = await pullMp3(fullUrl);
-    return streamData
-}
-
-function createBuffers(node) {
-    var context = window.AudioContext || window.webkitAudioContext
-    context = new context
-    request = new XMLHttpRequest();
-    request.open('GET', node['request']['responseURL'], true);
-    request.responseType = 'arraybuffer';
-    request.onload = function() {
-        let audioData = request.response;
-        context.decodeAudioData(audioData, function(buffer) {
-            dogBarkingBuffer = buffer;
-            console.log('buffer');
-            console.log(buffer);
-        });
-    }
+// done with first part of script, now analyze
+function analyzeSongBPM(mp3URL) {
+    console.log(mp3URL);
+    
+    request = buildRequest(mp3URL)
+    request.onload = decodeAndAnalyzeBuffer;
     request.send();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // var context = window.AudioContext || window.webkitAudioContext
-    // // Fetch Audio Track via AJAX with URL
-    // request = new XMLHttpRequest();
-    // await request.open('GET', url, true);
-    // request.responseType = 'arraybuffer';
-    // request.onload = async function() {
-    //     let audioData = request.response;
-    //     console.log(request);
-        
-    //     console.log(audioData);
-        
-        
-    //     await context.decodeAudioData(audioData, function(buffer) {
-    //         dogBarkingBuffer = buffer;
-    //     });
-    // }
-    // request.send();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    // request.onload = function(ajaxResponseBuffer) {
-   
-    //     // Create and Save Original Buffer Audio Context in 'originalBuffer'
-    //     var AudioContext = window.AudioContext || window.webkitAudioContext
-    //     var OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
-        
-    //     var audioCtx = new AudioContext();
-        
-    //     var songLength = ajaxResponseBuffer.total;
-    
-    //     // Arguments: Channels, Length, Sample Rate
-    //     var offlineCtx = new OfflineAudioContext(1, songLength, 44100);
-    //     source = offlineCtx.createBufferSource();
-        
-    //     var audioData = request.response;
-    //     console.log('audioData');
-    //     console.log(ajaxResponseBuffer);
-    //     audioCtx.decodeAudioData(audioData, function(buffer) {
-    
-    //         window.originalBuffer = buffer.getChannelData(0);
-    //         var source = offlineCtx.createBufferSource();
-    //         source.buffer = buffer;
-
-    //         // Create a Low Pass Filter to Isolate Low End Beat
-    //         var filter = offlineCtx.createBiquadFilter();
-    //         filter.type = "lowpass";
-    //         filter.frequency.value = 140;
-    //         source.connect(filter);
-    //         filter.connect(offlineCtx.destination);
-    //         console.log(offlineCtx);
-            
-    //         // Render this low pass filter data to new Audio Context and Save in 'lowPassBuffer'
-    //         offlineCtx.startRendering().then(function(lowPassAudioBuffer) {
-
-    //             var audioCtx = new(window.AudioContext || window.webkitAudioContext)();
-    //             var song = audioCtx.createBufferSource();
-    //             song.buffer = lowPassAudioBuffer;
-    //             song.connect(audioCtx.destination);
-
-    //             // Save lowPassBuffer in Global Array
-    //             window.lowPassBuffer = song.buffer.getChannelData(0);
-    //             console.log("Low Pass Buffer Rendered!");
-    //         });
-
-    //     },
-    //     function(e) {});
-    // }
-    // request.send();
 }
-    
-   
-   
 
-function analyzeMP3BPM(mp3Path) {
-    // Create offline context
-    var offlineContext = new OfflineAudioContext(1, 1000000, 44100);
+function buildRequest(mp3URL) {
+    audioCtxSrc = audioCtx.createBufferSource();
+    let _request_ = new XMLHttpRequest();
+    _request_.open('GET', mp3URL, true);
+    _request_.responseType = 'arraybuffer';
+    return _request_
+}
 
-    // Create buffer source
-    var source = offlineContext.createBufferSource();
-    source.buffer = buffer;
+// decode the buffer and analyze it
+function decodeAndAnalyzeBuffer() {
+    let audioData = request.response;
+    audioCtx.decodeAudioData(
+        audioData,
+        decodeThenAnalyzeBuffer,
+        function(e){ console.log("Error with decoding audio data" + e.err); }
+    );
+}
 
-    // Create filter
-    var filter = offlineContext.createBiquadFilter();
+function decodeThenAnalyzeBuffer(buffer) {
+    offlineContext = decodeBuffer(buffer);
+    offlineContext.oncomplete = renderBufferAndCalcBPM;
+}
+
+function decodeBuffer(_buffer_) {
+    // connect AudioContext node to the source object
+    audioCtxSrc.buffer = _buffer_;
+    audioCtxSrc.connect(audioCtx.destination);
+    audioCtxSrc.loop = true;
+    let offlineContext = new OfflineAudioContext(1, _buffer_.length, _buffer_.sampleRate);
+    let oSource = offlineContext.createBufferSource();
+    oSource.buffer = _buffer_;
+    let filter = offlineContext.createBiquadFilter();
+    filter.frequency.value = 150;
     filter.type = "lowpass";
-
-    // Pipe the song into the filter, and the filter into the offline context
-    source.connect(filter);
+    oSource.connect(filter);
     filter.connect(offlineContext.destination);
+    oSource.start(0);
+    offlineContext.startRendering();
+    return offlineContext;
+}
 
-    // Schedule the song to start playing at time:0
-    source.start(0);
+function calculateBPM(audioBufferArray) {
+    arrMax = audioBufferArray.reduce((max, value) => value > max ? value : max, audioBufferArray[0]);
+    arrMin = audioBufferArray.reduce((min, value) => value < min ? value : min, audioBufferArray[0]);
 
-    // Render the song
-    offlineContext.startRendering()
+    // set initial threshold, to be reduced via while loop
+    let thresholdPct = 0.9;
+    let threshold = arrMin + ((arrMax - arrMin) * thresholdPct);
+    
+    // get the array of peak locations, borrowed from https://stackoverflow.com/a/30112800
+    let peaksArr = getPeaksAtThreshold(audioBufferArray, threshold);
+    let intervalCountArr = countIntervalsBetweenNearbyPeaks(peaksArr);
+    let tempoCountArr = groupNeighborsByTempo(intervalCountArr);
+    console.log(threshold, arrMin, arrMax);
+    console.log('peaks', peaksArr);
+    console.log('intervalCounts', intervalCountArr);
+    console.log('tempoCounts', tempoCountArr);
+    
+    tempoCountArr.sort(function(a, b) {
+        return b.count - a.count;
+    });
 
-    // Act on the result
-    offlineContext.oncomplete = function(e) {
-        // Filtered buffer!
-        var filteredBuffer = e.renderedBuffer;
+    weightedAvg = calcWeightedAvg(tempoCountArr);
+
+    if (tempoCountArr.length) {
+        console.log(tempoCountArr[0].tempo, weightedAvg);
+        //output.innerText = tempoCountArr[0].tempo;
     };
 }
 
-// full function
-async function getAndAnalyzeMP3 (event) {
-    // prevent default
-    event.preventDefault();
+function renderBufferAndCalcBPM(offlineAudioCompletionEvent) {
+    let filteredBuffer = offlineAudioCompletionEvent.renderedBuffer;
 
-    // get the mp3 path
-    streamData = await getMP3Path();
-    console.log(streamData);
-    
-    // analyze the bpm
-    // mp3Path = './waiting-so-long.mp3'
-    createBuffers(streamData);
-    // bpm = analyzeMP3BPM(mp3Path);
+    // If you want to analyze both channels, use the other channel later
+    let audioBufferArray = filteredBuffer.getChannelData(0);
+
+    // algo to calculate bpm
+    calculateBPM(audioBufferArray);
 };
 
-// main function
-function main() {
-    let submitButton = document.querySelector('#getURL');
-
-    // the entire script basically needs to be assigned to the submit button
-    submitButton.addEventListener('click', getAndAnalyzeMP3)
+function getPeaksAtThreshold(_audioBufferArray_, _thresh_) {
+    var peaksArray = [];
+    for (let i = 0; i < _audioBufferArray_.length; i++) {
+        if (_audioBufferArray_[i] > _thresh_) {
+            peaksArray.push(i); // if value > threshold, it's a peak -> add the index of this value to list
+            i += (0.25 * 44100);
+        }
+    }
+    return peaksArray;
+}
+function countIntervalsBetweenNearbyPeaks(_peaksArr_) {
+    let intervalCountArray = [];
+    _peaksArr_.forEach(function(_peak_, idx) {
+        for (let i = 0; i < 10; i++) {
+            let interval = _peaksArr_[idx + i] - _peak_;
+            let foundInterval = intervalCountArray.some(function(intervalCount) {
+                if (intervalCount.interval === interval) return intervalCount.count++;
+            });
+                //Additional checks to avoid infinite loops in later processing
+            if (!isNaN(interval) && interval !== 0 && !foundInterval) {
+                intervalCountArray.push({'interval': interval, 'count': 1});
+            }
+        }
+    });
+    return intervalCountArray;
+}
+function groupNeighborsByTempo(_intervalCountArr_) {
+    let tempoCountArray = [];
+    _intervalCountArr_.forEach(function(intervalCount) {
+        
+        //Convert interval to tempo
+        let theoreticalTempo = 60 / (intervalCount.interval / 44100);
+        theoreticalTempo = Math.round(theoreticalTempo);
+        if (theoreticalTempo === 0) {return}
+        
+        //Adjust tempo to fit within the 90-180 BPM range
+        while (theoreticalTempo < 80 ) theoreticalTempo *= 2;
+        while (theoreticalTempo > 160) theoreticalTempo /= 2;
     
+        let foundTempo = tempoCountArray.some(function(tempoCount) {
+            if (tempoCount.tempo === theoreticalTempo) return tempoCount.count += intervalCount.count;
+        });
+        if (!foundTempo) {
+            tempoCountArray.push({
+            tempo: theoreticalTempo,
+            count: intervalCount.count
+            });
+        }
+    });
+    return tempoCountArray;
 }
+function calcWeightedAvg(listOfDicts) {
+    let countSum = 0;
+    listOfDicts.forEach(element => {
+        countSum += element['count'];
+    });
+    l = listOfDicts[0];
 
-main()
-
-
-
-
-
-
-
-
-
-
-
-
-// extra
-
-// not used yet- used for getting genre information
-async function getTrackInfo(fullURL) {
-    let trackIDRequest = await axios.get(fullURL);
-    let trackIDURI = trackIDRequest['data']['uri'];
-    let trackIDURL = `${trackIDURI}?client_id=${CLIENT_ID}`;
-    let metaRequest = await axios.get(trackIDURL);
-    let metaData = metaRequest['data'];
-}
-
-async function getSoundInfo (track_id) {
-    response = await axios.get(
-        `"https://api.soundcloud.com/tracks/${track_id}?client_id=${CLIENT_ID}"`
-    );
-    return response
+    let j = 0;
+    for (elem in l) {
+        if (j === 0) {target=elem} else if (j === 1) {count=elem}; j++
+    }
+    let weightedAvg = 0;
+    for (let i = 0; i < listOfDicts.length; i++) {
+        const element = listOfDicts[i];
+        let targetVal = element[target];
+        let countWeight = element[count] / countSum;
+        weightedAvg += targetVal * countWeight;
+    }
+    return weightedAvg
 }
