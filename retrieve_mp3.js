@@ -4,6 +4,10 @@ AudioContext = window.AudioContext || window.webkitAudioContext;
 OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
 audioCtx = new AudioContext();
 
+// html elements to be edited
+bpmText = document.querySelector('#bpm');
+genreEstText = document.querySelector('#est-genre');
+
 // main function
 function main() {
     let submitButton = document.querySelector('#getURL');
@@ -18,28 +22,30 @@ async function getMP3AndFindBPM(event) {
     // prevent default
     event.preventDefault();
 
+    displayLoading();
+
     // get the mp3 path
     mp3URL = await getMP3Path();
-
     // analyze the bpm
     //mp3URL = './waiting-so-long.mp3'
     analyzeSongBPM(mp3URL);
 };
 
+function displayLoading() {
+    bpmText.innerText = 'Loading';
+    genreEstText.innerText = 'Loading';
+}
 // get the mp3
+/*
+https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix
+https://soundcloud.com/skrillex/skrillex-feat-beam-mumbai-powe
+https://soundcloud.com/skrillex/skrillex-feat-alvin-risk-fuji-opener
+https://soundcloud.com/skrillex/skrillex-bangarang-feat-sirah
+https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long
+*/
 async function getMP3Path() {
-    // delete this line, its for testing only
-    //document.querySelector('#url').value = 'https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix';
-    // document.querySelector('#url').value = 'https://soundcloud.com/skrillex/skrillex-feat-beam-mumbai-power';
-    //document.querySelector('#url').value = 'https://soundcloud.com/skrillex/skrillex-feat-alvin-risk-fuji-opener';
-    //document.querySelector('#url').value = 'https://soundcloud.com/skrillex/skrillex-bangarang-feat-sirah';
-    // document.querySelector('#url').value = 'https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long';
-
     // get the text from the input field
     let trackURL = mungUserInput()
-    if (trackURL === '') {
-        alert('please enter valid url');
-    }
 
     // get the track id via the main url
     let fullUrl = `https://api.soundcloud.com/resolve?url=${trackURL}&client_id=${CLIENT_ID}`
@@ -54,6 +60,7 @@ async function getMP3Path() {
 function mungUserInput() {
     let submitField = document.querySelector('#url');
     let userInput = submitField.value;
+    userInput = 'https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long';
 
     // check if its a permalink or full URL
     if (userInput.includes('soundcloud.com/')) {
@@ -76,8 +83,6 @@ async function pullMp3URL(url) {
 
 // done with first part of script, now analyze
 function analyzeSongBPM(mp3URL) {
-    console.log(mp3URL);
-    
     request = buildRequest(mp3URL)
     request.onload = decodeAndAnalyzeBuffer;
     request.send();
@@ -136,8 +141,9 @@ function calculateBPM(audioBufferArray) {
     let peaksArr = getPeaksAtThreshold(audioBufferArray, threshold);
     let intervalCountArr = countIntervalsBetweenNearbyPeaks(peaksArr);
     let tempoCountArr = groupNeighborsByTempo(intervalCountArr);
-    console.log(threshold, arrMin, arrMax);
-    console.log('peaks', peaksArr);
+    // console.log(threshold, arrMin, arrMax);
+    // console.log('peaks', peaksArr);
+    // console.log('intervalCounts', intervalCountArr);
     console.log('intervalCounts', intervalCountArr);
     console.log('tempoCounts', tempoCountArr);
     
@@ -145,11 +151,15 @@ function calculateBPM(audioBufferArray) {
         return b.count - a.count;
     });
 
-    weightedAvg = calcWeightedAvg(tempoCountArr);
+    // weightedAvg = calcWeightedAvg(tempoCountArr);
 
     if (tempoCountArr.length) {
-        console.log(tempoCountArr[0].tempo, weightedAvg);
-        //output.innerText = tempoCountArr[0].tempo;
+        //console.log(tempoCountArr[0].tempo, weightedAvg);
+        bpm = tempoCountArr[0].tempo;
+        bpmText.innerHTML = bpm;
+        if (bpm > 110 && bpm < 130) {
+            genreEstText.innerText = 'Dance';
+        }
     };
 }
 
@@ -198,7 +208,7 @@ function groupNeighborsByTempo(_intervalCountArr_) {
         theoreticalTempo = Math.round(theoreticalTempo);
         if (theoreticalTempo === 0) {return}
         
-        //Adjust tempo to fit within the 90-180 BPM range
+        //Adjust tempo to fit within the 80-160 BPM range
         while (theoreticalTempo < 80 ) theoreticalTempo *= 2;
         while (theoreticalTempo > 160) theoreticalTempo /= 2;
     
