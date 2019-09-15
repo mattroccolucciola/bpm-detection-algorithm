@@ -2,11 +2,37 @@ track_id = 170734376;
 CLIENT_ID = '6aSX01kZxpetA85mf5R9Ezqs3ozjO2zc';
 AudioContext = window.AudioContext || window.webkitAudioContext;
 OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
+
 audioCtx = new AudioContext();
+function createAudioContext(desiredSampleRate) {
+    desiredSampleRate = typeof desiredSampleRate === 'number'
+        ? desiredSampleRate
+        : 44100;
+    var ctx = new AudioContext();
+
+    // Check if hack is necessary. Only occurs in iOS6+ devices
+    // and only when you first boot the iPhone, or play a audio/video
+    // with a different sample rate
+    if (/(iPhone|iPad)/i.test(navigator.userAgent) && ctx.sampleRate !== desiredSampleRate) {
+        let _buffer_ = ctx.createBuffer(1, 1, desiredSampleRate);
+        var dummy = ctx.createBufferSource();
+        dummy.buffer = _buffer_;
+        dummy.connect(ctx.destination);
+        dummy.start(0);
+        dummy.disconnect();
+
+        ctx.close(); // dispose old context
+        ctx = new AudioContext();
+    }
+    return ctx;
+}
+audioCtx = createAudioContext(44100);
 
 // html elements to be edited
 bpmText = document.querySelector('#bpm');
 genreEstText = document.querySelector('#est-genre');
+bpmText.className = 'sub';
+genreEstText.className = 'sub';
 
 // main function
 function main() {
@@ -60,16 +86,12 @@ async function getMP3Path() {
 function mungUserInput() {
     let submitField = document.querySelector('#url');
     let userInput = submitField.value;
-    userInput = 'https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long';
 
     // check if its a permalink or full URL
     if (userInput.includes('soundcloud.com/')) {
         urlString = userInput;
     } else if (userInput.includes('/')) {
         urlString = `https://soundcloud.com/${userInput}`;
-    } else {
-        alert('Please use valid SoundCloud URL');
-        return
     }
     return urlString
 }
@@ -108,6 +130,7 @@ function decodeAndAnalyzeBuffer() {
 
 function decodeThenAnalyzeBuffer(buffer) {
     offlineContext = decodeBuffer(buffer);
+    offlineContext.sampleRate = 44100;
     offlineContext.oncomplete = renderBufferAndCalcBPM;
 }
 
@@ -116,7 +139,9 @@ function decodeBuffer(_buffer_) {
     audioCtxSrc.buffer = _buffer_;
     audioCtxSrc.connect(audioCtx.destination);
     audioCtxSrc.loop = true;
-    let offlineContext = new OfflineAudioContext(1, _buffer_.length, _buffer_.sampleRate);
+    
+    //let offlineContext = new OfflineAudioContext(1, _buffer_.length, _buffer_.sampleRate);
+    let offlineContext = new OfflineAudioContext(1, _buffer_.length, 44100);
     let oSource = offlineContext.createBufferSource();
     oSource.buffer = _buffer_;
     let filter = offlineContext.createBiquadFilter();
@@ -141,20 +166,13 @@ function calculateBPM(audioBufferArray) {
     let peaksArr = getPeaksAtThreshold(audioBufferArray, threshold);
     let intervalCountArr = countIntervalsBetweenNearbyPeaks(peaksArr);
     let tempoCountArr = groupNeighborsByTempo(intervalCountArr);
-    // console.log(threshold, arrMin, arrMax);
-    // console.log('peaks', peaksArr);
-    // console.log('intervalCounts', intervalCountArr);
-    console.log('intervalCounts', intervalCountArr);
-    console.log('tempoCounts', tempoCountArr);
-    
     tempoCountArr.sort(function(a, b) {
         return b.count - a.count;
     });
 
-    // weightedAvg = calcWeightedAvg(tempoCountArr);
+    weightedAvg = calcWeightedAvg(tempoCountArr);
 
     if (tempoCountArr.length) {
-        //console.log(tempoCountArr[0].tempo, weightedAvg);
         bpm = tempoCountArr[0].tempo;
         bpmText.innerHTML = bpm;
         if (bpm > 110 && bpm < 130) {

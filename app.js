@@ -7,9 +7,13 @@ imgElem = document.querySelector('.img');
 imgText = document.querySelector('#img');
 releaseDateText = document.querySelector('#release-date');
 outputElem = document.querySelector('.output');
+embedElem = document.querySelector('.embed');
+lengthText = document.querySelector('#length');
+songTitleElem = document.querySelector('.song-title');
+inputElem = document.querySelector('.input');
+headerElem = document.querySelector('header');
 /*
 this script is for getting and displaying the song information
-
 Algo:
 1. get the song title element
 2. get the genre element
@@ -30,8 +34,16 @@ function displayInfo(_songInfo_) {
     titleText.innerText = _songInfo_['title'];
     imgText.setAttribute('src', _songInfo_['img']);
     genreText.innerText = _songInfo_['genre'];
+    genreText.className = 'sub';
     releaseDateText.innerText = _songInfo_['release_date'];
+    releaseDateText.className = 'sub';
     outputElem.style.visibility = 'visible';
+    embedElem.innerHTML = _songInfo_['embed'];
+    lengthText.innerText = _songInfo_['length'];
+    lengthText.className = 'sub';
+    songTitleElem.style.visibility = 'visible';
+    inputElem.parentElement.removeChild(inputElem);
+    headerElem.appendChild(inputElem);
 }
 
 function displayLoading_(progress) {
@@ -72,7 +84,6 @@ async function getSongInfo() {
 
     // get the text from the input field
     let trackURL = mungUserInput()
-    if (trackURL === '') {alert('please enter valid url')}
 
     // get the track id via the main url
     let fullUrl = `https://api.soundcloud.com/resolve?url=${trackURL}&client_id=${CLIENT_ID}`
@@ -86,7 +97,6 @@ async function getSongInfo() {
 function mungUserInput() {
     let submitField = document.querySelector('#url');
     let userInput = submitField.value;
-    userInput = 'https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long';
 
     // check if its a permalink or full URL
     if (userInput.includes('soundcloud.com/')) {
@@ -110,12 +120,26 @@ async function pullMp3URL_(url) {
     let imgPathPre = infoData['artwork_url'];
     let imgPath = imgPathPre.replace('large', 't500x500');
 
+    // length
+    //190528/1000/60
+    let origTime = (eval(infoData['duration']) / 1000) / 60;
+    let minutes = Math.floor(origTime);
+    let seconds = Math.floor((origTime - minutes) * 60)
+    if (seconds < 10) {
+        seconds = `0${seconds}`;
+    }
+    let lengthStr = `${minutes}:${seconds}`;
+    
+    let embedURL = `<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${infoData['id']}&color=%2350a8a8&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>`;
+
     let info = {
         'img'  : imgPath,
         'title': infoData['title'],
         'permalink': infoData['permalink_url'],
         'release_date': infoData['created_at'],
         'genre': infoData['genre'],
+        'embed': embedURL,
+        'length': lengthStr,
     };
     return info;
 }

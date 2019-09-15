@@ -5,12 +5,13 @@ body {
 }
 
 header {
-    top:0;
-    left:0;
-    position:absolute;
+    top: 0;
+    left: 0;
+    position: absolute;
     padding: 0 15px 5px 0;
     border-bottom: 4px ridge black;
     border-right: 4px ridge black;
+    background: slategray;
 }
     header nav {
         position: relative;
@@ -24,24 +25,43 @@ header {
         }
         header nav .sup {
             font-size: 50px;
+            color: rgba(58, 85, 126, 0.788);
         }
         header nav .sub {
             font-size: 10px;
+            color: rgb(197, 196, 196);
+        }
+        header nav .bar {
+            border: 10px;
+            padding: 1px;
+            height: 100%;
+            background: black;
         }
         .sup,.sub,.title {
             display: flex;
             flex-flow: column;
             align-items: center;
         }
+    header.search {
+        position: fixed;
+        padding: 0 12px 4px 0;
+        border-bottom: 2px solid rgba(61, 60, 60, 0.719);
+        border-right: 2px solid  rgba(61, 60, 60, 0.719);
+        z-index: 100;
+    }
+        header.search nav .title{
+            width: 20px;
+        }
+        header.search nav .sup {
+            font-size: 35px;
+        }
+        header.search nav .sub {
+            font-size: 7px;
+        }
 
 main {
-    display: flex;
-    flex-flow: row;
-    align-content: center;
-    justify-content: center;
-    margin: 0 auto;
-    align-items: stretch;
-    width: 100%;
+    margin: 0;
+    width: 95%;
     position: relative;
 }
     div.center {
@@ -49,13 +69,17 @@ main {
         flex-grow: 0;
         display: flex;
         flex-flow: column;
+        position: relative;
+    }
+    .intro {
+        position: relative;
     }
     .intro p {
         margin: 0 auto;
         text-align: center;
         line-height: 1;
         margin: 0.5em;
-        text-overflow: wrap;
+        /* text-overflow: wrap; */
     }
     .input {
         display: flex;
@@ -66,39 +90,103 @@ main {
     }
         .input .enter {
             width: 500px;
-            margin:20px auto;
+            margin: 20px auto;
         }
-    
+        .input.search {
+            position: fixed;
+            top: 20px;
+            left: 20%;
+            right: 0;
+            width: 100%;
+            margin: -12px;
+            z-index: 100;
+        }
+            .input.search form {
+                display: flex;
+                flex-flow: row;
+                right: 0;
+                height:50px;
+            }
+            .input.search .enter {
+                width: 68%;
+                height: 40px;
+                font-size: 20px;
+                margin: 0;
+                right: 0;
+                border-top-left-radius: 5px;
+                border-bottom-left-radius: 5px;
+            }
+            .input.search .submit {
+                all: unset;
+                background-color: rgb(119, 134, 92);
+                height: 40px;
+                border-radius: 5px;
+                padding: 3px 4px;
+                font-size: 18px;
+                width: 10%;
+            }
     .output {
     margin: 0 auto;
-    text-align: center;
     visibility: hidden;
     display: flex;
     flex-flow: row;
-    justify-items: space-between;
-    align-content: space-between;
-    align-items: space-between;
-    background: rgba(161, 154, 112, 0.418);
+    justify-items: space-evenly;
+    align-content: space-evenly;
+    align-items: space-evenly;
     padding: 1px;
     border-radius: 15px;
-    overflow-x: auto;
+    /* overflow-y: auto; */
+    width: 100%;
+    position: relative;
     }
-        .output div {
-            position: relative;
-            padding: 3px 5px;
-            
-            text-align: center;
-            float:left;
-            vertical-align: 50%;
-            display:table;
+
+        .output #img {
+            width: 110%;
+        }
+        .output .song-info {
+            display: flex;
+            flex-flow: column;
+            justify-content: space-evenly;
+            align-content: space-evenly;
+            justify-items: space-evenly;
+            width: 80%;
+            align-items: center;
+            right: 0;
         }
             .output div span {
                 width: 100%;
-                float: right;
                 text-align: center;
             }
+            .output .song-info div {
+                background: grey;
+                padding: 2px 10px;
+                width: auto;
+                border-radius: 10px;
+            }
+            .output .song-info .sup {
+                font-weight: 900;
+                border-bottom: 2px solid black;
+                width: 80%;
+                margin: 5px auto;
+            }
+            .output .song-info .sub {
+                width: 100%;
+                margin: 5px auto;
+                text-align: center;
+            }
+        .song-title {
+            visibility: hidden;
+            text-align: center;
+            padding: 15px;
+            width: 50%;
+            margin: 10px auto;
+            border-radius: 10px;
+            font-weight: 900;
+            background: rgba(167, 138, 85, 0.705);
+        }
 
-@media screen and (max-width: 450px) {
+
+@media screen and (max-width: 700px) {
     body {
         margin:0;
         position: absolute;
@@ -122,6 +210,7 @@ main {
                 margin: 0 -50px;
             }
             header nav .sup {
+                color: rgba(255, 255, 255, 0.582);
                 font-size: 40px;
             }
             header nav .sub {
@@ -134,9 +223,9 @@ main {
             }
 
     header.search {
+        all: unset;
         top: 0;
-        left: 0;
-        width: 25%;
+        width: 100%;
         height: 20px;
         padding: 1px 0 8px 0;
         margin: 0;
@@ -144,9 +233,12 @@ main {
         border-bottom: 4px ridge black;
         border-right: 4px ridge black;
         z-index: 100;
+        right:0;
+        float: left;
     }
-        header.search nav {
-            justify-content: space-evenly;
+        header.search div.nav {
+            width: 20%;
+            position: relative;
         }
             header.search nav .title {
                 margin: 0 1px;
@@ -156,6 +248,9 @@ main {
             }
             header.search nav .sub {
                 visibility: hidden;
+            }
+            header nav .bar {
+                height: 70%;
             }
 
     main {
@@ -170,45 +265,22 @@ main {
     main.search {
         margin: 50px auto;
     }
-        div.center {
+        .intro {
             order: 1;
-            flex-grow: 0;
-            justify-content: center;
+            visibility: collapse;
         }
-            .intro {
-                order: 1;
-            }
-                .intro p {
-                    text-overflow: wrap;
-                }
             .input {
                 order: 0;
                 margin: 20px auto;
-                z-index: 100;
-            }
-            .input.search {
-                position: fixed;
-                top: 0;
-                right: 0;
-                margin: 0;
                 z-index: 100;
             }
                 .input form {
                     display: flex;
                     flex-flow: column;
                 }
-                .input.search form {
-                    display: flex;
-                    flex-flow: row;
-                }
                     .input .enter {
                         width: 300px;
                         height: 35px;
-                        margin: 0;
-                    }
-                    .input.search .enter {
-                        width: 202px;
-                        height: 25px;
                         margin: 0;
                     }
                     .input .submit {
@@ -218,32 +290,85 @@ main {
                         border-radius: 5px;
                         margin-top: 10px;
                     }
+
+                .input.search {
+                    z-index: 100;
+                    background: green;
+                    width: 60%;
+                    top:0;
+                    right:0;
+                    height: inherit;
+                    width: inherit;
+                    margin: -32px 0;
+                    position: relative;
+            }
+            
+                .input.search form {
+                    width: 100%;
+                    right: 0;
+                    margin: 0;
+                    display: flex;
+                    flex-flow: row;
+                    height: inherit;
+                }
+                    .input.search .enter {
+                        width: 80%;
+                        height: 25px;
+                        margin: 0;
+                        height: inherit;
+                        width: 68%;
+                        font-size: 20px;
+                        right: 0;
+                        border-top-left-radius: 5px;
+                        border-bottom-left-radius: 5px;
+                    }
                     .input.search .submit {
-                        all: unset;
                         background-color: rgb(119, 134, 92);
                         height: 25px;
                         border-radius: 5px;
                         padding: 3px 4px;
-                        font-size: 13px;
+                        font-size: 10px;
+                        
+
+                        height: inherit;
+                        background-color: rgb(119, 134, 92);
+                        width: 10%;
                     }
+
             .output {
                 background: none;
                 flex-flow: column;
                 width: 95%;
             }
-                .output img {
+                .output #img {
                     width: 90%;
                 }
                 .output .song-info {
                     display: flex;
                     flex-flow: row;
                     justify-content: space-evenly;
-                    overflow-x: auto;
+                    /* overflow-x: auto; */
                     -webkit-overflow-scrolling: touch;
                     background: rgba(99, 84, 84, 0.582);
                 }
+                    .song-info div {
+                        border-right: 1px solid grey;
+                    }
+                    .song-info div div{
+                        border-right:none;
+                    }
+                    .song-info div:last-child{
+                        border-right:none;
+                    }
+                    .song-info .sup {
+                        border-bottom: 1px solid grey;
+                        padding: 5px;
+                        font-weight: 800;
+                    }
+                    .song-info .sub {
+                        padding-top: 5px;
+                    }
 }
-
 
 div.clr {
     clear:both;

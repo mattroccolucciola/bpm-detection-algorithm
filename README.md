@@ -44,7 +44,7 @@ TIMELINE
 | Component        | Priority | Estimated Time | Time Invested | Time ∆   |
 | :-------------:  | :------: | :------------: | :-----------: | :------: |
 | HTML Design      |    L     |    30 Min      |    20 min     | -10 min  |
-| CSS Structuring  |    L     |    30 Min      |    30 min     | |
+| CSS Structuring  |    L     |    30 Min      |   510 min     | |
 | JS for base site |    L     |    30 Min      |     0 min     | |
 | Pull MP3 - algo  |    H     |   120 Min      |   355 min     | +235 min |
 | Analyze BPM algo |    H     |   360 Min      |   525 min     | +165 min |
