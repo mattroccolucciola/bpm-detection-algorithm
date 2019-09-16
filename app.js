@@ -114,14 +114,12 @@ function mungUserInput() {
 async function pullMp3URL_(url) {
     let ApiInfo = await axios.get(url);
     let infoData = ApiInfo['data'];
-    console.log('infoData', infoData);
 
     // image
     let imgPathPre = infoData['artwork_url'];
     let imgPath = imgPathPre.replace('large', 't500x500');
 
     // length
-    //190528/1000/60
     let origTime = (eval(infoData['duration']) / 1000) / 60;
     let minutes = Math.floor(origTime);
     let seconds = Math.floor((origTime - minutes) * 60)

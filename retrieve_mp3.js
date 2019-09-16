@@ -63,11 +63,18 @@ function displayLoading() {
 }
 // get the mp3
 /*
-https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix
-https://soundcloud.com/skrillex/skrillex-feat-beam-mumbai-powe
-https://soundcloud.com/skrillex/skrillex-feat-alvin-risk-fuji-opener
-https://soundcloud.com/skrillex/skrillex-bangarang-feat-sirah
-https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long
+samples!!!!!!!!
+
+https://soundcloud.com/shallou/you-and-me 113
+https://soundcloud.com/local-natives/when-am-i-gonna-lose-you-nick 142
+https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix 103 
+https://soundcloud.com/kelseylu/due-west-skrillex-remix 104
+
+
+Very close examples:
+https://soundcloud.com/21savage/a-lot 146
+https://soundcloud.com/fiendbassy/tribe-with-j-cole 89
+
 */
 async function getMP3Path() {
     // get the text from the input field
@@ -171,8 +178,11 @@ function calculateBPM(audioBufferArray) {
     });
 
     weightedAvg = calcWeightedAvg(tempoCountArr);
-
+    console.log(`calculated bpm: ${tempoCountArr[0]['tempo']}    |||    weighted avg: ${weightedAvg}`, tempoCountArr);
+    
     if (tempoCountArr.length) {
+        console.log('here');
+        
         bpm = tempoCountArr[0].tempo;
         bpmText.innerHTML = bpm;
         if (bpm > 110 && bpm < 130) {
