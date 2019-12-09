@@ -1,4 +1,8 @@
-CLIENT_ID = '6aSX01kZxpetA85mf5R9Ezqs3ozjO2zc';
+
+// global vars
+CLIENT_ID = 'Vu5tlmvC9eCLFZkxXG32N1yQMfDSAPAA';
+
+// doc element selectors
 titleElem = document.querySelector('.song-title');
 titleText = document.querySelector('#song-title');
 genreElem = document.querySelector('.orig-genre');
@@ -12,6 +16,10 @@ lengthText = document.querySelector('#length');
 songTitleElem = document.querySelector('.song-title');
 inputElem = document.querySelector('.input');
 headerElem = document.querySelector('header');
+
+// util fxns
+
+
 /*
 this script is for getting and displaying the song information
 Algo:
@@ -112,15 +120,14 @@ function mungUserInput() {
 
 // get the assets from servers
 async function pullMp3URL_(url) {
-    let ApiInfo = await axios.get(url);
-    let infoData = ApiInfo['data'];
+    let resJSON = await _get(url);
 
     // image
-    let imgPathPre = infoData['artwork_url'];
+    let imgPathPre = resJSON['artwork_url'];
     let imgPath = imgPathPre.replace('large', 't500x500');
 
     // length
-    let origTime = (eval(infoData['duration']) / 1000) / 60;
+    let origTime = (eval(resJSON['duration']) / 1000) / 60;
     let minutes = Math.floor(origTime);
     let seconds = Math.floor((origTime - minutes) * 60)
     if (seconds < 10) {
@@ -128,14 +135,14 @@ async function pullMp3URL_(url) {
     }
     let lengthStr = `${minutes}:${seconds}`;
     
-    let embedURL = `<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${infoData['id']}&color=%2350a8a8&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>`;
+    let embedURL = `<iframe width="100%" height="300" scrolling="no" frameborder="no" allow="autoplay" src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${resJSON['id']}&color=%2350a8a8&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"></iframe>`;
 
     let info = {
         'img'  : imgPath,
-        'title': infoData['title'],
-        'permalink': infoData['permalink_url'],
-        'release_date': infoData['created_at'],
-        'genre': infoData['genre'],
+        'title': resJSON['title'],
+        'permalink': resJSON['permalink_url'],
+        'release_date': resJSON['created_at'],
+        'genre': resJSON['genre'],
         'embed': embedURL,
         'length': lengthStr,
     };

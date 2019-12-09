@@ -1,8 +1,12 @@
+// global vars
 track_id = 170734376;
-CLIENT_ID = '6aSX01kZxpetA85mf5R9Ezqs3ozjO2zc';
+CLIENT_ID = 'Vu5tlmvC9eCLFZkxXG32N1yQMfDSAPAA';
 AudioContext = window.AudioContext || window.webkitAudioContext;
-OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext
+OfflineAudioContext = window.OfflineAudioContext || window.webkitOfflineAudioContext;
 
+// util fxns
+
+// main
 audioCtx = new AudioContext();
 function createAudioContext(desiredSampleRate) {
     desiredSampleRate = typeof desiredSampleRate === 'number'
@@ -53,7 +57,6 @@ async function getMP3AndFindBPM(event) {
     // get the mp3 path
     mp3URL = await getMP3Path();
     // analyze the bpm
-    //mp3URL = './waiting-so-long.mp3'
     analyzeSongBPM(mp3URL);
 };
 
@@ -64,16 +67,10 @@ function displayLoading() {
 // get the mp3
 /*
 samples!!!!!!!!
-
 https://soundcloud.com/shallou/you-and-me 113
 https://soundcloud.com/local-natives/when-am-i-gonna-lose-you-nick 142
-https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix 103 
+https://soundcloud.com/petitbiscuit/we-were-young-robotaki-remix 103
 https://soundcloud.com/kelseylu/due-west-skrillex-remix 104
-
-
-Very close examples:
-https://soundcloud.com/21savage/a-lot 146
-https://soundcloud.com/fiendbassy/tribe-with-j-cole 89
 
 */
 async function getMP3Path() {
@@ -105,9 +102,10 @@ function mungUserInput() {
 
 // get the asset from servers
 async function pullMp3URL(url) {
-    info = await axios.get(url);
-    streamURL = info['data']['stream_url'] + `?client_id=${CLIENT_ID}`;
-    return await axios.get(streamURL);
+    resJSON = await _get(url);
+    streamURL = `${resJSON['stream_url']}?client_id=${CLIENT_ID}`;
+    let payload = await _get(streamURL);
+    return payload
 }
 
 // done with first part of script, now analyze
@@ -131,7 +129,7 @@ function decodeAndAnalyzeBuffer() {
     audioCtx.decodeAudioData(
         audioData,
         decodeThenAnalyzeBuffer,
-        function(e){ console.log("Error with decoding audio data" + e.err); }
+        function(e){ console.log("Error with decoding audio data" + e.err)}
     );
 }
 
@@ -181,8 +179,6 @@ function calculateBPM(audioBufferArray) {
     console.log(`calculated bpm: ${tempoCountArr[0]['tempo']}    |||    weighted avg: ${weightedAvg}`, tempoCountArr);
     
     if (tempoCountArr.length) {
-        console.log('here');
-        
         bpm = tempoCountArr[0].tempo;
         bpmText.innerHTML = bpm;
         if (bpm > 110 && bpm < 130) {

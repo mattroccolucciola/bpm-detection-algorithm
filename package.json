@@ -1,0 +1,27 @@
+{
+  "name": "bda",
+  "version": "1.0.0",
+  "description": "This project takes SoundCloud songs (via URL) and returns a BPM using soundwave analysis",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "webpack-dev-server --hot"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mattrlucciola/bpm-detection-algorithm.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mattrlucciola/bpm-detection-algorithm/issues"
+  },
+  "homepage": "https://github.com/mattrlucciola/bpm-detection-algorithm#readme",
+  "devDependencies": {
+    "webpack-dev-server": "^3.9.0"
+  },
+  "dependencies": {
+    "webpack": "^4.41.2",
+    "webpack-cli": "^3.3.10"
+  }
+}
