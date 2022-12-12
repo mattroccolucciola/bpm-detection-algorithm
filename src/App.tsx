@@ -9,7 +9,7 @@ import Nav from "./components/Nav";
  */
 const App: React.FC<SProps> = () => {
   return (
-    <Stack flexDirection="column">
+    <Stack flexDirection="column" color={"black"}>
       <Nav />
       <Body />
     </Stack>
