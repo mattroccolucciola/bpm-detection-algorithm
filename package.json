@@ -2,16 +2,7 @@
   "name": "bda",
   "version": "1.0.0",
   "description": "This project takes SoundCloud songs (via URL) and returns a BPM using soundwave analysis",
-  "main": "app.js",
-  "scripts": {
-    "start": "react-scripts start",
-    "mb-move-assets": "cp -r ./assets/* ./",
-    "mb-move-new-build": "mv -f ./build/* ./ && rm -rf ./build",
-    "mb-remove-old-build": "rm -rf ./static ./assets ./images",
-    "mb-manage-new-build": "yarn mb-remove-old-build && yarn mb-move-new-build && yarn mb-move-assets",
-    "build": "react-scripts build",
-    "deploy": "yarn build && yarn mb-manage-new-build"
-  },
+  "main": "src/index.tsx",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mrlucciola/bpm-detection-algorithm.git"
@@ -38,21 +29,32 @@
     "url": "https://github.com/mrlucciola/bpm-detection-algorithm/issues"
   },
   "homepage": "https://github.com/mrlucciola/bpm-detection-algorithm#readme",
-  "devDependencies": {
-    "@types/node": "^18.7.11",
-    "@types/react": "^18.0.17",
-    "@types/react-dom": "^18.0.6",
-    "typescript": "^4.7.4"
+  "scripts": {
+    "start": "react-scripts start",
+    "mb-move-assets": "cp -r ./assets/* ./",
+    "mb-move-new-build": "mv -f ./build/* ./ && rm -rf ./build",
+    "mb-remove-old-build": "rm -rf ./static ./assets ./images",
+    "mb-manage-new-build": "yarn mb-remove-old-build && yarn mb-move-new-build && yarn mb-move-assets",
+    "build": "react-scripts build",
+    "deploy": "yarn build && yarn mb-manage-new-build"
   },
   "dependencies": {
-    "@emotion/react": "^11.10.0",
-    "@emotion/styled": "^11.10.0",
-    "@mui/material": "^5.10.2",
+    "@emotion/react": "^11.10.5",
+    "@emotion/styled": "^11.10.5",
+    "@mui/icons-material": "^5.10.16",
+    "@mui/material": "^5.10.17",
+    "@mui/types": "^7.2.2",
     "mobx": "^6.6.1",
     "mobx-react-lite": "^3.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
     "react-scripts": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.7.11",
+    "@types/react": "^18.0.17",
+    "@types/react-dom": "^18.0.6",
+    "typescript": "^4.7.4"
   }
 }

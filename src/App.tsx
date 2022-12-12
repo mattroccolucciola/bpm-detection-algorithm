@@ -1,18 +1,18 @@
-// style
-import { Grid } from "@mui/material";
+// mui
+import Stack from "@mui/material/Stack";
+import { SProps } from "./mui/interfaces";
 // components
 import Body from "./components/Body";
 import Nav from "./components/Nav";
 
-/**
- * Renders the entire application
+/** Top-level application component: renders the entire app
  */
-const App = () => {
+const App: React.FC<SProps> = () => {
   return (
-    <Grid>
+    <Stack flexDirection="column">
       <Nav />
       <Body />
-    </Grid>
+    </Stack>
   );
 };
 

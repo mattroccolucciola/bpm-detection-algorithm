@@ -1,5 +1,8 @@
 // react
 import ReactDOM from "react-dom/client";
+// mui
+import { ThemeProvider } from "@mui/material";
+import { baseTheme } from "./mui/baseTheme";
 // state
 // import AppContext, { RootStore } from "./mobx/context";
 // components
@@ -15,7 +18,9 @@ root.render(
   <>
     {/* <React.StrictMode> */}
     {/* <AppContext.Provider value={new RootStore()}> */}
-    <App />
+    <ThemeProvider theme={baseTheme}>
+      <App />
+    </ThemeProvider>
     {/* </AppContext.Provider> */}
     {/* </React.StrictMode> */}
   </>
