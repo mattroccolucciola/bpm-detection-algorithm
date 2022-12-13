@@ -5,7 +5,10 @@ import { Box, Button, Divider, Stack, TextField } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { SProps } from "../mui/interfaces";
 import { TG } from "../mui/Utils";
+import { getSongInfo } from "../scraping/main";
 // components
+// local
+import { CLIENT_ID } from "../.main.env";
 
 const onChangeUpdateText =
   (setter: React.Dispatch<React.SetStateAction<string>>) =>
@@ -19,7 +22,7 @@ const onChangeUpdateText =
  * 1. Submit
  * 1. Reset form
  */
-const urlSubmit = (
+const urlSubmit = async (
   text: string,
   textSetter: React.Dispatch<React.SetStateAction<string>>,
   errorSetter: React.Dispatch<React.SetStateAction<string>>
@@ -30,7 +33,10 @@ const urlSubmit = (
     validatedInput = "https://soundcloud.com/" + validatedInput;
   }
   // submit
-  // fetch(text);
+  // await getSongInfo(validatedInput, CLIENT_ID);
+
+  await getSongInfo(text, CLIENT_ID);
+  
   if (false) {
     errorSetter("Error with url" + validatedInput);
     return;
@@ -39,9 +45,12 @@ const urlSubmit = (
   textSetter("");
   errorSetter("");
 };
+
+const example =
+  "https://soundcloud.com/octobersveryown/drake-21-savage-rich-flex";
 /** Input field for song URL */
 const SongInput: React.FC = () => {
-  const [textInput, setTextInput] = useState<string>("");
+  const [textInput, setTextInput] = useState<string>(example);
   const [errorInput, setErrorInput] = useState<string>("");
 
   return (
