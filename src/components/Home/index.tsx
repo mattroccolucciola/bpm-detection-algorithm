@@ -19,31 +19,39 @@ const onChangeUpdateText =
     setter(newValue);
   };
 
+interface SongMetrics {
+  [index: string]: string | number;
+  genre: string;
+  waveform_url: string;
+  comment_count: number;
+  likes_count: number;
+  playback_count: number;
+  reposts_count: number;
+}
+
 /** # Validate and send the url for retrieval
  *
  * 1. Validate
  * 1. Submit
  * 1. Reset form
- * 1. Update song info state
+ * 1. Update `songMetrics` state
  */
 const urlSubmit = async (
   text: string,
   textSetter: React.Dispatch<React.SetStateAction<string>>,
-  errorSetter: React.Dispatch<React.SetStateAction<string>>
+  errorSetter: React.Dispatch<React.SetStateAction<string>>,
+  songMetricsSetter: React.Dispatch<React.SetStateAction<SongMetrics>>
 ) => {
   let validatedInput = text;
   // validate
   if (!text.includes("soundcloud.com/")) {
-    validatedInput = "https://soundcloud.com/" + validatedInput;
+    errorSetter("Error with url" + validatedInput);
+    return;
   }
 
   // submit
   const songData = await getSongInfo(text);
-
-  if (false) {
-    errorSetter("Error with url" + validatedInput);
-    return;
-  }
+  songMetricsSetter(songData as SongMetrics);
 
   // reset form
   textSetter("");
@@ -56,6 +64,9 @@ const example =
 const SongInput: React.FC = () => {
   const [textInput, setTextInput] = useState<string>(example);
   const [errorInput, setErrorInput] = useState<string>("");
+  const [songMetrics, setSongMetrics] = useState<SongMetrics>(
+    {} as SongMetrics
+  );
 
   return (
     <Box position="relative" flexDirection="column">
@@ -67,7 +78,7 @@ const SongInput: React.FC = () => {
         color="secondary"
         onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
           if (e.key === "Enter")
-            urlSubmit(textInput, setTextInput, setErrorInput);
+            urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics);
         }}
         fullWidth
         error={errorInput !== ""}
@@ -78,7 +89,9 @@ const SongInput: React.FC = () => {
         variant="contained"
         fullWidth
         disableRipple
-        onClick={() => urlSubmit(textInput, setTextInput, setErrorInput)}
+        onClick={() =>
+          urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics)
+        }
       >
         Submit
       </Button>
