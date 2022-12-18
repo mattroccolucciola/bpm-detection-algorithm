@@ -4,8 +4,9 @@ import { useState } from "react";
 import { Box, Button, TextField } from "@mui/material";
 // utils
 import { getSongInfo } from "../../scraping/main";
+import { useAppContext } from "../../mobx/context";
 
-interface SongMetrics {
+export interface SongMetrics {
   [index: string]: string | number;
   genre: string;
   waveform_url: string;
@@ -59,11 +60,9 @@ const example =
 /** Displays information about input to the fetch call
  */
 const SongInput: React.FC = () => {
+  const setSongMetrics = useAppContext(s=>s.main.setSongMetrics);
   const [textInput, setTextInput] = useState<string>(example);
   const [errorInput, setErrorInput] = useState<string>("");
-  const [songMetrics, setSongMetrics] = useState<SongMetrics>(
-    {} as SongMetrics
-  );
 
   return (
     <Box position="relative" flexDirection="column">

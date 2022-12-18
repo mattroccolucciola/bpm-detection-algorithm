@@ -1,13 +1,12 @@
 // state
 import { makeAutoObservable } from "mobx";
-// stores
-import { RootStore } from "../context";
-import { SongMetrics } from "../../components/Home/SongInput";
+import { createContext, useContext } from "react";
+import { SongMetrics } from "./SongInput";
 
 /** # Main */
 export class MainStore {
   // ctor
-  constructor(rootStore: RootStore) {
+  constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
   }
 
@@ -34,3 +33,15 @@ export class MainStore {
   //////////////////////// HELPERS ////////////////////////
   /////////////////////////////////////////////////////////
 }
+
+// context
+const MainContext = createContext<MainStore>(new MainStore());
+
+// hook
+export const useMainContext: (callerFxn: (stores: MainStore) => {}) => any = (
+  callerFxn: (stores: MainStore) => any
+) => {
+  const context = useContext(MainContext) as MainStore;
+
+  return callerFxn(context);
+};

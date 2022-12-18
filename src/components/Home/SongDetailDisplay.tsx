@@ -5,6 +5,8 @@ import Grid from "@mui/material/Unstable_Grid2/Grid2";
 
 // interfaces
 import { SProps } from "../../mui/interfaces";
+import { useAppContext } from "../../mobx/context";
+import { useMainContext } from "./mobx";
 interface InfoGroup {
   title: string;
   data: string;
@@ -49,11 +51,11 @@ const SongInfo: React.FC<SProps> = () => {
 /** # Contains song info returned from the call by `<SongInput />`
  */
 const SongDetailDisplay: React.FC<SProps> = () => {
-  const songTitle = "";
+  const title = useMainContext((s) => s.title);
 
   return (
     <Stack direction="column">
-      <TG>{songTitle}</TG>
+      <TG>{title}</TG>
       <SongInfo />
       <Grid className="embed"></Grid>
     </Stack>
