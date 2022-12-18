@@ -1,104 +1,12 @@
-// react
-import { useState } from "react";
 // mui
-import { Box, Button, Divider, Stack, TextField } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
 import { SProps } from "../../mui/interfaces";
 import { TG } from "../../mui/Utils";
 // components
-// utils
-import { getSongInfo } from "../../scraping/main";
+import SongInput from './SongInput';
 
-/** # Event handler - update text on changing
- * @returns
- */
-const onChangeUpdateText =
-  (setter: React.Dispatch<React.SetStateAction<string>>) =>
-  (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const newValue = e.target.value;
-    setter(newValue);
-  };
-
-interface SongMetrics {
-  [index: string]: string | number;
-  genre: string;
-  waveform_url: string;
-  comment_count: number;
-  likes_count: number;
-  playback_count: number;
-  reposts_count: number;
-}
-
-/** # Validate and send the url for retrieval
- *
- * 1. Validate
- * 1. Submit
- * 1. Reset form
- * 1. Update `songMetrics` state
- */
-const urlSubmit = async (
-  text: string,
-  textSetter: React.Dispatch<React.SetStateAction<string>>,
-  errorSetter: React.Dispatch<React.SetStateAction<string>>,
-  songMetricsSetter: React.Dispatch<React.SetStateAction<SongMetrics>>
-) => {
-  let validatedInput = text;
-  // validate
-  if (!text.includes("soundcloud.com/")) {
-    errorSetter("Error with url" + validatedInput);
-    return;
-  }
-
-  // submit
-  const songData = await getSongInfo(text);
-  songMetricsSetter(songData as SongMetrics);
-
-  // reset form
-  textSetter("");
-  errorSetter("");
-};
-
-const example =
-  "https://soundcloud.com/octobersveryown/drake-21-savage-rich-flex";
 /** # Input field for song URL */
-const SongInput: React.FC = () => {
-  const [textInput, setTextInput] = useState<string>(example);
-  const [errorInput, setErrorInput] = useState<string>("");
-  const [songMetrics, setSongMetrics] = useState<SongMetrics>(
-    {} as SongMetrics
-  );
-
-  return (
-    <Box position="relative" flexDirection="column">
-      <TextField
-        variant="filled"
-        placeholder="https://soundcloud.com/<artist>/<track-name>"
-        value={textInput}
-        onChange={onChangeUpdateText(setTextInput)}
-        color="secondary"
-        onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
-          if (e.key === "Enter")
-            urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics);
-        }}
-        fullWidth
-        error={errorInput !== ""}
-        helperText={errorInput}
-        label="Soundcloud Song URL/slug"
-      />
-      <Button
-        variant="contained"
-        fullWidth
-        disableRipple
-        onClick={() =>
-          urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics)
-        }
-      >
-        Submit
-      </Button>
-    </Box>
-  );
-};
-
 const InfoItem: React.FC<{ categoryInfo: InfoGroup }> = ({ categoryInfo }) => {
   return (
     <Stack direction="column">
@@ -139,7 +47,9 @@ const SongInfo: React.FC = () => {
   );
 };
 
-const LoadedSong: React.FC = () => {
+/** # Contains song info returned from the call by `<SongInput />`
+ */
+const SongDetails: React.FC = () => {
   const songTitle = "";
 
   return (
@@ -163,7 +73,7 @@ const Home: React.FC<SProps> = () => {
         i.e. "https://soundcloud.com/acct/song-name" or "acct/song-name"
       </TG>
       <SongInput />
-      <LoadedSong />
+      <SongDetails />
     </Stack>
   );
 };
