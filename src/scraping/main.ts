@@ -185,7 +185,7 @@ export interface SongData {
   permalink?: string;
   permalink_url?: string;
   state?: string;
-  title?: string;
+  title: string;
   track_format?: string;
   uri?: string;
   urn?: string;

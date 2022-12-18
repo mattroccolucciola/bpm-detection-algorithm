@@ -4,7 +4,7 @@ import { createContext, useContext } from "react";
 import { SongMetrics } from "./SongInput";
 
 /** # Main */
-export class MainStore {
+export class HomeStore {
   // ctor
   constructor() {
     makeAutoObservable(this, {}, { autoBind: true });
@@ -24,7 +24,9 @@ export class MainStore {
 
   /////////////////////////////////////////////////////////
   //////////////////////// ACTIONS ////////////////////////
-  setSongMetrics() {}
+  setSongMetrics(input: SongMetrics) {
+    this.songMetrics = input;
+  }
   //////////////////////// ACTIONS ////////////////////////
   /////////////////////////////////////////////////////////
 
@@ -35,13 +37,13 @@ export class MainStore {
 }
 
 // context
-const MainContext = createContext<MainStore>(new MainStore());
+export const HomeContext = createContext<HomeStore>(new HomeStore());
 
 // hook
-export const useMainContext: (callerFxn: (stores: MainStore) => {}) => any = (
-  callerFxn: (stores: MainStore) => any
+export const useHomeContext: (callerFxn: (stores: HomeStore) => {}) => any = (
+  callerFxn: (stores: HomeStore) => any
 ) => {
-  const context = useContext(MainContext) as MainStore;
+  const context = useContext(HomeContext) as HomeStore;
 
   return callerFxn(context);
 };

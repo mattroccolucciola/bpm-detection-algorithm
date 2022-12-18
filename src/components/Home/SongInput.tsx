@@ -1,10 +1,12 @@
 // react
 import { useState } from "react";
+// state
+import { useHomeContext } from "./mobx";
 // mui
 import { Box, Button, TextField } from "@mui/material";
 // utils
 import { getSongInfo } from "../../scraping/main";
-import { useAppContext } from "../../mobx/context";
+import { observer } from "mobx-react-lite";
 
 export interface SongMetrics {
   [index: string]: string | number;
@@ -14,6 +16,7 @@ export interface SongMetrics {
   likes_count: number;
   playback_count: number;
   reposts_count: number;
+  title: string;
 }
 
 /** # Event handler - update text on changing
@@ -25,6 +28,7 @@ const onChangeUpdateText =
     const newValue = e.target.value;
     setter(newValue);
   };
+
 /** # Validate and send the url for retrieval
  *
  * 1. Validate
@@ -60,7 +64,7 @@ const example =
 /** Displays information about input to the fetch call
  */
 const SongInput: React.FC = () => {
-  const setSongMetrics = useAppContext(s=>s.main.setSongMetrics);
+  const setSongMetrics = useHomeContext((s) => s.setSongMetrics);
   const [textInput, setTextInput] = useState<string>(example);
   const [errorInput, setErrorInput] = useState<string>("");
 
@@ -95,4 +99,4 @@ const SongInput: React.FC = () => {
   );
 };
 
-export default SongInput;
+export default observer(SongInput);

@@ -1,13 +1,13 @@
 // react
 import { createContext, useContext } from "react";
 // state
-import { MainStore } from "./stores/main";
+// import { MainStore } from "./stores/main";
 
 export class RootStore {
-  main: MainStore;
+  // main: MainStore;
 
   constructor() {
-    this.main = new MainStore(this);
+    // this.main = new MainStore(this);
   }
 }
 

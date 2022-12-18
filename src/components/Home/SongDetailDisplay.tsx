@@ -1,12 +1,14 @@
+// state
+import { useHomeContext } from "./mobx";
 // mui
 import { Divider, Stack } from "@mui/material";
-import { TG } from "../../mui/Utils";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
+import { TG } from "../../mui/Utils";
 
 // interfaces
 import { SProps } from "../../mui/interfaces";
-import { useAppContext } from "../../mobx/context";
-import { useMainContext } from "./mobx";
+import { SongMetrics } from "./SongInput";
+import { observer } from "mobx-react-lite";
 interface InfoGroup {
   title: string;
   data: string;
@@ -51,7 +53,8 @@ const SongInfo: React.FC<SProps> = () => {
 /** # Contains song info returned from the call by `<SongInput />`
  */
 const SongDetailDisplay: React.FC<SProps> = () => {
-  const title = useMainContext((s) => s.title);
+  const title: string = useHomeContext((s) => s.songMetrics.title);
+  console.log("title", title);
 
   return (
     <Stack direction="column">
@@ -62,4 +65,4 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   );
 };
 
-export default SongDetailDisplay;
+export default observer(SongDetailDisplay);
