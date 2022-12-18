@@ -1,6 +1,7 @@
 import axios from "axios";
+import { CLIENT_ID } from "../.main.env";
 
-const getSongStats = (songData: ResolveJson) => {
+const getSongStats = (songData: SongData) => {
   const songStats: { [key in string]: any } = {};
   const songDataMap = new Map<string, string>();
   ["reposts_count", "comment_count"].forEach((key) => {
@@ -28,90 +29,73 @@ const buildSignedPlaylistCall = (
   const url = `https://api-v2.soundcloud.com/media/soundcloud:tracks:${trackId}/${hlsBody}/stream/hls?client_id=${clientId}&track_authorization=${trackAuth}`;
   return url;
 };
+
+interface PlaylistPayload {
+  mp3FileName: string;
+  policy: string;
+  signature: string;
+  keyPairId: string;
+  trackAuthorization: string;
+}
+
+/** # Parse the track's `playlist URL`.
+ * URL has the structure:
+ * 
+https://cf-hls-media.sndcdn.com/\
+  playlist/\
+  4ufacd02y5DN.128.mp3/\
+  playlist.m3u8?\
+    Policy=eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLWhscy1tZWRpYS5zbmRjZG4uY29tL3BsYXlsaXN0LzR1ZmFjZDAyeTVETi4xMjgubXAzL3BsYXlsaXN0Lm0zdTgqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNjcxMzE0Mzk2fX19XX0_\
+    &Signature=IrPBKSoCmN5h0uof084x25hOtZhnFEnxeFRTk-vr0bTKyatIBw7L-jDf7XwyKz3heNX12vqttsAdSpsr2rmA674U3AxW-QCyezsLzrZJ1TKIvk62xQ-R4tW8n27vyz5tctk7Y~pMa2EBZ0Ctka5rHzwO6TN~j1BTMFaf5KcKBJrx4b9BtzuKELVSHA01KlV79Qa7n1g0WVNN2tDsYB6GUwRRNlQEshJakpQDM6qzvmB26Tg0fVCOMNzEgfDzP8LTM5FpWroqMPYMTs7kWpZrJ5EEewzMLKmQ4EZ9nhiupmDMy3Y52MRn~Fc~VtdTpsb~KYTWrKG9g6d0KkfMFBCqUw__\
+    &Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ\
+    &track_authorization=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJVUyIsInN1YiI6IiIsInJpZCI6Ijc4MGQwNWU1LTFhMzItNDRmNy04ZjZmLTk0Mzk2NjBiMDJkMiIsImlhdCI6MTY3MTMxNDAzNn0.ohoTp60H0vELqV4WcIv7m5VRU5ZGhO8duAU8csKEOKE
+ */
+const parsePlaylistUrl = (playlistUrl: string): PlaylistPayload => {
+  const playlistUrlBaseSplit = playlistUrl.split(
+    "https://cf-hls-media.sndcdn.com/playlist/"
+  );
+  const mp3FileName = playlistUrlBaseSplit[1].split("/")[0];
+  const policy = playlistUrl.split("playlist.m3u8?Policy=")[1].split("&")[0];
+  const signature = playlistUrl.split("&Signature=")[1].split("&")[0];
+  const keyPairId = playlistUrl.split("&Key-Pair-Id=")[1].split("&")[0];
+  const trackAuthorization = playlistUrl
+    .split("&track_authorization=")[1]
+    .split("&")[0];
+  return {
+    mp3FileName,
+    policy,
+    signature,
+    keyPairId,
+    trackAuthorization,
+  };
+};
 const fetchPlaylistUrl = async (
   trackId: number,
   trackHashId: string,
   trackHls: string,
   trackAuth: string,
   clientId: string
-) => {
+): Promise<PlaylistPayload> => {
   const playlistCallUrl = buildSignedPlaylistCall(
     trackId,
     trackHls,
     trackAuth,
     clientId
   );
+
   // fetch
   if (playlistCallUrl) console.log("fetching:", playlistCallUrl);
-
   // response `https://cf-hls-media.sndcdn.com/playlist/${trackHashId}.128.mp3/playlist.m3u8?Policy=${policy}&Signature=EFdCzjwm1c2cEmERyXCAlKdufsv7L~YYbZGbQJt5O9Mp0zl~-rIg0-yUO95M-o09Y69rfFMwSnh7fBG6oyXI5PFCSncYXJBusgO2FrBjOW6b36wf-~hHPT~pc5L7LWkXvLEy4eszR7zWIfV3ygTwjdzORvwOBWi-9-FVPyatgceBF9cr9mUYQ2cPTJdvMYT9lNg9bHyc-F9FDG23A8fcQ7HQlDKcNo0tZJZFDo4nq9cGHfCi6shHBuLvuP3rFH9hxvj3uFUypY0e3FGIUEqYukICi2mBm5mgSqapZnseuvvlRTK-LmZaf06FGB~LIufMA6UIQ~poOQshvDdMinfFGA__&Key-Pair-Id=APKAI6TU7MMXM5DG6EPQ&track_authorization=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJVUyIsInN1YiI6IiIsInJpZCI6ImEyNWUzZjUyLTk0YjktNGNmZS05YmNkLWRjMmM1NzczNmVmNyIsImlhdCI6MTY2MTI3NjY4Nn0.IqnQXjxT8qPyEM6L4A20JLCYDH0OwMu44yrRoJu5rWM`;
   const res = await fetch(playlistCallUrl);
-  // const resBody = res.body;
-  const resJson = await res.json();
-  
+  const resPlaylistJson: { url: string } = await res.json();
 
-  // const policy = "eyJTdGF0ZW1lbnQiOlt7IlJlc291cmNlIjoiKjovL2NmLWhscy1tZWRpYS5zbmRjZG4uY29tL3BsYXlsaXN0L3psb2JFQVFTWFZmdS4xMjgubXAzL3BsYXlsaXN0Lm0zdTgqIiwiQ29uZGl0aW9uIjp7IkRhdGVMZXNzVGhhbiI6eyJBV1M6RXBvY2hUaW1lIjoxNjYxMjgzMDczfX19XX0_"
-
-  // should get this 'https://cf-hls-media.snd...'
-  // return playlistCallObj.url;
+  return parsePlaylistUrl(resPlaylistJson.url);
 };
-/** Track url is validated prior to calling this.
- *
- * URL is in the form: https://soundcloud.com/${userInput}
- */
-export const getSongInfo = async (trackUrl: string, CLIENT_ID: string) => {
-  // show that query is in progress
-  // displayLoading_();
 
-  // get the song info
-  // songInfo = await getSongInfo();
-  // get the text from the input field
-  // prev mungUserInput()
-
-  // const resolveUrl = `https://api-v2.soundcloud.com/resolve?url=${trackUrl}&client_id=${CLIENT_ID}`; //&client_id=${CLIENT_ID}
-  const resolveUrl = `${trackUrl}`;
-  // get the track id via the main url
-
-  // previously: `https://api.soundcloud.com/resolve?url=${trackUrl}&client_id=${CLIENT_ID}`;
-  // const resolveUrl = `https://api-v2.soundcloud.com/resolve?url=${trackUrl}`; //&client_id=${CLIENT_ID}
-  // const resolveUrl = `https://api.soundcloud.com/resolve?url=${trackUrl}&client_id=${CLIENT_ID}`;
-  // const resolveUrl = `https://api.soundcloud.com/resolve?url=${trackUrl}`; // &client_id=${CLIENT_ID}
-  // TnPIzomBfuS0m5YKxvy0Aqy9ClIC8F9j
-  // const resolveUrl = `https://api-v2.soundcloud.com/connect?client_id=${CLIENT_ID}&response_type=code`;
-  // const resolveUrl = `https://api.soundcloud.com/connect?client_id=${CLIENT_ID}&redirect_uri=${trackUrl}&response_type=code`;
-  // const resolveUrl = `https://api.soundcloud.com/connect?client_id=${CLIENT_ID}&response_type=code`;
-  // const resolveUrl = `https://api.soundcloud.com/connect?client_id=${CLIENT_ID}`;
-  // NEW TYPE
-  // `https://secure.soundcloud.com/connect?response_type=code&client_id=TnPIzomBfuS0m5YKxvy0Aqy9ClIC8F9j`
-  // https://api-auth.soundcloud.com/connect/access-request-validation?client_id=fXuVKzsVXlc6tzniWWS31etd7VHWFUuN
-  // const resolveUrl = `https://api-auth.soundcloud.com/connect/access-request-validation?client_id=${CLIENT_ID}`;
-  // const resolveUrl = `https://secure.soundcloud.com/connect?client_id=${CLIENT_ID}&response_type=code`;
-  // const resolveUrl = `https://api.soundcloud.com/oauth2/token/client_credentials`
-  console.log("respolve", resolveUrl);
-
-  // const { data } = await axios.get(resolveUrl);
-  // console.log('data', data)
-  const infoRes = await fetch(resolveUrl, {
-    // mode: "no-cors",
-    method: "GET",
-    headers: {
-      // Accept: "application/json",
-      // "Content-Type": "application/json",
-      accept: "*/*",
-      // "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
-      // "Access-Control-Allow-Origin": "*",
-      // "Access-Control-Allow-Headers":
-      //   "Content-Type, Access-Control-Allow-Headers, X-Requested-With",
-      // Authorization: `Auth ${CLIENT_ID}`, //OAuth ACCESS_TOKEN
-    },
-  });
-  console.log("infoRes", infoRes);
-
-  const text = await infoRes.text();
-  console.log("text", text);
+const parseSongDataFromHtml = (inputHtml: string): SongData => {
   const parser = new DOMParser();
   const htmlScripts = parser
-    .parseFromString(text, "text/html")
+    .parseFromString(inputHtml, "text/html")
     .body.querySelectorAll("script");
 
   // there are multiple script elements, we need to find the one with `window.__sc_hydration` in it
@@ -122,10 +106,17 @@ export const getSongInfo = async (trackUrl: string, CLIENT_ID: string) => {
 
   const scriptStr = script?.text.split("window.__sc_hydration =")[1]!;
   const scriptJson: any[] = JSON.parse(scriptStr);
-  const songData: ResolveJson = scriptJson.find((elem) => {
+  const songData: SongData = scriptJson.find((elem) => {
     return elem.hydratable && elem.hydratable === "sound";
   }).data;
-  console.log("valuevalue", songData);
+
+  return songData;
+};
+/** # Get MP3 file and other data from song data
+ *
+ * @param songData
+ */
+const getMp3 = async (songData: SongData) => {
   const trackHashId = songData.waveform_url
     .split("https://wave.sndcdn.com/")[1]
     .split("_m.json")[0];
@@ -140,30 +131,44 @@ export const getSongInfo = async (trackUrl: string, CLIENT_ID: string) => {
   const trackAuth: string = songData.track_authorization;
 
   // get the playlist url
-  const playlistUrl = fetchPlaylistUrl(
+  const playlistUrl: PlaylistPayload = await fetchPlaylistUrl(
     trackId,
     trackHashId,
     trackHls,
     trackAuth,
     CLIENT_ID
   );
-  // const body = infoRes.body?.getReader();
-  // console.log("body", body);
-  // const bodyUsed = infoRes.bodyUsed;
-  // console.log("bodyUsed", bodyUsed);
-  // // @ts-ignore
-  // const formData = await infoRes.formData();
-  // // @ts-ignore
-  // console.log("formData", formData);
-  // // @ts-ignore
-  // const infoBlob = await infoRes.blob();
-  // // @ts-ignore
-  // console.log("blob", infoBlob);
-
-  // displayInfo(songInfo);
 };
 
-export interface ResolveJson {
+/** Track url is validated prior to calling this.
+ *
+ * URL is in the form: https://soundcloud.com/${userInput}
+ */
+export const getSongInfo = async (trackUrl: string) => {
+  const resolveUrl = `${trackUrl}`;
+  console.log("respolve", resolveUrl);
+
+  // send request for html
+  const infoRes = await fetch(resolveUrl, {
+    method: "GET",
+    headers: {
+      accept: "*/*",
+    },
+  });
+
+  // convert html to text
+  const htmlStr: string = await infoRes.text();
+
+  // parse html, get the song info from the script tag
+
+  const songData: SongData = parseSongDataFromHtml(htmlStr);
+  console.log("valuevalue", songData);
+
+  return songData;
+  // return getMp3(songData)
+};
+
+export interface SongData {
   [index: string]:
     | string
     | number
@@ -173,7 +178,7 @@ export interface ResolveJson {
   created_at?: string;
   description?: string;
   embeddable_by?: string;
-  genre?: string;
+  genre: string;
   kind?: string;
   last_modified?: string;
   license?: string;
@@ -187,14 +192,14 @@ export interface ResolveJson {
   waveform_url: string;
   display_date?: string;
   tag_list?: string;
-  comment_count?: number;
+  comment_count: number;
   download_count?: number;
   duration?: number;
   full_duration?: number;
   id: number; // 1317984667
-  likes_count?: number;
-  playback_count?: number;
-  reposts_count?: number;
+  likes_count: number;
+  playback_count: number;
+  reposts_count: number;
   user_id?: number;
   commentable?: boolean;
   downloadable?: boolean;

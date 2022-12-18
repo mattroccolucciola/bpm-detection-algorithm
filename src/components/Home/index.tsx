@@ -3,24 +3,28 @@ import { useState } from "react";
 // mui
 import { Box, Button, Divider, Stack, TextField } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import { SProps } from "../mui/interfaces";
-import { TG } from "../mui/Utils";
-import { getSongInfo } from "../scraping/main";
+import { SProps } from "../../mui/interfaces";
+import { TG } from "../../mui/Utils";
 // components
-// local
-import { CLIENT_ID } from "../.main.env";
+// utils
+import { getSongInfo } from "../../scraping/main";
 
+/** # Event handler - update text on changing
+ * @returns
+ */
 const onChangeUpdateText =
   (setter: React.Dispatch<React.SetStateAction<string>>) =>
   (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const newValue = e.target.value;
     setter(newValue);
   };
-/** Validate and send the url for retrieval
+
+/** # Validate and send the url for retrieval
  *
  * 1. Validate
  * 1. Submit
  * 1. Reset form
+ * 1. Update song info state
  */
 const urlSubmit = async (
   text: string,
@@ -32,15 +36,15 @@ const urlSubmit = async (
   if (!text.includes("soundcloud.com/")) {
     validatedInput = "https://soundcloud.com/" + validatedInput;
   }
-  // submit
-  // await getSongInfo(validatedInput, CLIENT_ID);
 
-  await getSongInfo(text, CLIENT_ID);
-  
+  // submit
+  const songData = await getSongInfo(text);
+
   if (false) {
     errorSetter("Error with url" + validatedInput);
     return;
   }
+
   // reset form
   textSetter("");
   errorSetter("");
@@ -48,7 +52,7 @@ const urlSubmit = async (
 
 const example =
   "https://soundcloud.com/octobersveryown/drake-21-savage-rich-flex";
-/** Input field for song URL */
+/** # Input field for song URL */
 const SongInput: React.FC = () => {
   const [textInput, setTextInput] = useState<string>(example);
   const [errorInput, setErrorInput] = useState<string>("");
@@ -85,16 +89,18 @@ const SongInput: React.FC = () => {
 const InfoItem: React.FC<{ categoryInfo: InfoGroup }> = ({ categoryInfo }) => {
   return (
     <Stack direction="column">
-      <TG sx={{}}>{categoryInfo.title}</TG>
+      <TG>{categoryInfo.title}</TG>
       <Divider orientation="horizontal" />
-      <TG sx={{}}>{categoryInfo.data}</TG>
+      <TG>{categoryInfo.data}</TG>
     </Stack>
   );
 };
+
 interface InfoGroup {
   title: string;
   data: string;
 }
+
 const categoryMap = new Map<string, InfoGroup>(
   Object.entries({
     bpm: { title: "BPM", data: "" },
@@ -104,6 +110,7 @@ const categoryMap = new Map<string, InfoGroup>(
     releaseDt: { title: "Release Date", data: "" },
   })
 );
+
 const SongInfo: React.FC = () => {
   // create the list of elements
   const categoryElems: React.ReactElement<{ categoryInfo: InfoGroup }>[] = [];
@@ -114,14 +121,12 @@ const SongInfo: React.FC = () => {
   return (
     <Stack direction="row">
       <img id="img" src="" alt="" />
-      <Stack direction="row" className="song-info">
-        {categoryElems}
-      </Stack>
+      <Stack direction="row">{categoryElems}</Stack>
     </Stack>
   );
 };
 
-const LoadedSong = () => {
+const LoadedSong: React.FC = () => {
   const songTitle = "";
 
   return (
