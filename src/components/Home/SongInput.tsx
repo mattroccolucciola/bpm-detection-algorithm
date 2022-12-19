@@ -17,6 +17,7 @@ export interface SongMetrics {
   playback_count: number;
   reposts_count: number;
   title: string;
+  artwork_url: string;
 }
 
 /** # Event handler - update text on changing
