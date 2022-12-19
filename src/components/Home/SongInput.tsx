@@ -18,6 +18,8 @@ export interface SongMetrics {
   reposts_count: number;
   title: string;
   artwork_url: string;
+  permalink_url: string;
+  permalink: string;
 }
 
 /** # Event handler - update text on changing

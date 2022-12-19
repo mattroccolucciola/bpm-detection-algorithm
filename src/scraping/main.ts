@@ -185,14 +185,14 @@ export interface SongData {
   };
   track_authorization: string; // "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJVUyIsInN1YiI6IiIsInJpZCI6ImEyNWUzZjUyLTk0YjktNGNmZS05YmNkLWRjMmM1NzczNmVmNyIsImlhdCI6MTY2MTI4MDg3M30.NtHZS90th2v8CbYqlPkjemw9qbZZHBl2ZBCQwFnTksk";
   artwork_url: string;
+  permalink_url: string;
+  permalink: string;
   // created_at?: string;
   // description?: string;
   // embeddable_by?: string;
   // kind?: string;
   // last_modified?: string;
   // license?: string;
-  // permalink?: string;
-  // permalink_url?: string;
   // state?: string;
   // track_format?: string;
   // uri?: string;

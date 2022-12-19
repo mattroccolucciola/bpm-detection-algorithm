@@ -1,11 +1,13 @@
+// state
+import { HomeContext, HomeStore, useHomeContext } from "./mobx";
 // mui
 import { Stack } from "@mui/material";
 import { SProps } from "../../mui/interfaces";
 import { TG } from "../../mui/Utils";
-import { HomeContext, HomeStore } from "./mobx";
-import SongDetailDisplay from "./SongDetailDisplay";
 // components
+import SongDetailDisplay from "./SongDetailDisplay";
 import SongInput from "./SongInput";
+import { observer } from "mobx-react-lite";
 
 /** Home: View component for home page
  */
