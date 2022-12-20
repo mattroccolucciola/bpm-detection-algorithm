@@ -26,7 +26,6 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   );
   // effects
   useLayoutEffect(() => {
-    // setIsAnimate(!!title);
     title && setAnimateState("success, pending");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);

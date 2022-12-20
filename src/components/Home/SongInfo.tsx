@@ -70,8 +70,8 @@ const SongInfoItem: React.FC<{
     >
       {category.key === "release_date" ? (
         <Stack flexDirection="column" alignItems="center">
-          <TG>{new Date(categoryData).toDateString()}</TG>
           <TG fontSize={2}>{calcDaysAgo(categoryData as string)}</TG>
+          <TG>{new Date(categoryData).toDateString()}</TG>
         </Stack>
       ) : (
         <TG>{categoryData}</TG>
