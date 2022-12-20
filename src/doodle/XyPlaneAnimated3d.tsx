@@ -13,12 +13,11 @@ import Doodle from ".";
  */
 const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
   // state
-  const isAnimate = useAppContext((s) => s.isAnimate);
-  // const setIsAnimate = useAppContext((s) => s.setIsAnimate);
   const animateState = useAppContext((s) => s.animateState);
-  const setAnimateState: AppStore["setAnimateState"] = useAppContext(
-    (s) => s.setAnimateState
-  );
+  // see if we can restart the animation
+  // const setAnimateState: AppStore["setAnimateState"] = useAppContext(
+  //   (s) => s.setAnimateState
+  // );
   const doodleRef = useRef<HTMLDivElement>(null);
 
   const fwdAnimation = "success";
@@ -41,7 +40,7 @@ const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
         };
       });
     }
-  }, [animateState, doodleRef.current]);
+  }, [animateState]);
 
   return (
     <Doodle

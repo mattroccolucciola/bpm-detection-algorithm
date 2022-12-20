@@ -21,7 +21,6 @@ import { AppStore, useAppContext } from "../../mobxApp";
 const SongDetailDisplay: React.FC<SProps> = () => {
   // state
   const title: string = useHomeContext((s) => s.songMetrics.title);
-  const setIsAnimate = useAppContext((s) => s.setIsAnimate);
   const setAnimateState: AppStore["setAnimateState"] = useAppContext(
     (s) => s.setAnimateState
   );
@@ -29,6 +28,7 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   useLayoutEffect(() => {
     // setIsAnimate(!!title);
     title && setAnimateState("success, pending");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);
 
   return title ? (

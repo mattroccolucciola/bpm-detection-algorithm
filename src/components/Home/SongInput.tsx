@@ -49,7 +49,7 @@ const urlSubmit = async (
   let validatedInput = text;
   // validate
   if (!text.includes("soundcloud.com/")) {
-    errorSetter("Error: URL not valid.  " + `(input: "${validatedInput}")`);
+    errorSetter(`Error: URL not valid.  (input: "${validatedInput}")`);
     return;
   }
 

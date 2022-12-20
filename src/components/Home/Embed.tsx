@@ -13,13 +13,7 @@ import { SProps } from "../../mui/interfaces";
 const Embed: React.FC<SProps> = () => {
   // state
   const songId: number = useHomeContext((s) => s.songMetrics.id);
-  const permalinkUrl: string = useHomeContext(
-    (s) => s.songMetrics.permalink_url
-  );
-  const permalink: string = useHomeContext((s) => s.songMetrics.permalink);
   const iframeRef = useRef<HTMLIFrameElement>(null);
-  // artist
-  const artistUrl: string = permalinkUrl.replace(`/${permalink}`, "");
 
   return (
     <Stack flexDirection="row" p={1}>
@@ -28,6 +22,7 @@ const Embed: React.FC<SProps> = () => {
         height="166"
         ref={iframeRef}
         src={`https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/tracks/${songId}&color=%23a488a0&auto_play=false&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false`}
+        title="soundcloud-embed"
       ></iframe>
       <div
         style={{
