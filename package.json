@@ -44,6 +44,7 @@
     "@mui/material": "^5.10.17",
     "@mui/types": "^7.2.2",
     "css-doodle": "^0.32.0",
+    "gh-pages": "^4.0.0",
     "mobx": "^6.6.1",
     "mobx-react-lite": "^3.4.0",
     "react": "^18.2.0",
