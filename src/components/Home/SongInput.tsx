@@ -20,6 +20,7 @@ export interface SongMetrics {
   artwork_url: string;
   permalink_url: string;
   permalink: string;
+  id: number;
 }
 
 /** # Event handler - update text on changing

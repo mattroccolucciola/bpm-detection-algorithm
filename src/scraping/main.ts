@@ -1,4 +1,3 @@
-import axios from "axios";
 import { CLIENT_ID } from "../.main.env";
 
 const getSongStats = (songData: SongData) => {
