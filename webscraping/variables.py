@@ -1,3 +1,0 @@
-src = "https://secure.soundcloud.com/web-auth?client_id=TnPIzomBfuS0m5YKxvy0Aqy9ClIC8F9j&device_id=683441-36705-269279-165910&app_id=46941&tracking=local&redirect_uri=https%3A%2F%2Fsoundcloud.com%2Fsignin%2Fcallback&state=eyJjbGllbnRfaWQiOiJUblBJem9tQmZ1UzBtNVlLeHZ5MEFxeTlDbElDOEY5aiIsIm5vbmNlIjoianJKSmVLTXBTRlMtM051WXdpZGdDekdIMXJOUUdzbXpVbnhLS0dpdzB5UmFUUUFDSWouTlFCV2JDd3NhNk52ZSJ9&code_challenge=HpXpAA8v866JbnnrTtU-OcZzFUZCHcARPg0p921oZ3I&code_challenge_method=S256#page_name=homepage%3Amain&start_url=https%3A%2F%2Fsoundcloud.com%2F&start_view=sign_in&is_visible=false"
-
-client_id = "TnPIzomBfuS0m5YKxvy0Aqy9ClIC8F9j"
