@@ -13,12 +13,12 @@ import SongInput from "./SongInput";
 const Home: React.FC<SProps> = () => {
   return (
     <HomeContext.Provider value={new HomeStore()}>
-      <Stack flexDirection="column" position="relative" color="whitesmoke">
-        <TG fontSize="50px" position="relative">
-          Input a valid SoundCloud track URL/permalink
+      <Stack flexDirection="column" position="relative" color="whitesmoke" flex="1" justifyContent="center">
+        <TG fontSize="50px" position="relative" p="20px" width={"100%"} textAlign="center">
+          Input a valid SoundCloud track URL
         </TG>
-        <TG fontSize="20px" position="relative">
-          i.e. "https://soundcloud.com/acct/song-name" or "acct/song-name"
+        <TG fontSize="20px" position="relative" p="20px" color="white" sx={{fontWeight: 100}} textAlign="center">
+          i.e. "https://soundcloud.com/acct/song-name"
         </TG>
         <SongInput />
         <SongDetailDisplay />

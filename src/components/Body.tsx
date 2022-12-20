@@ -41,7 +41,7 @@ const PageLayout: React.FC = () => {
  */
 const Body: React.FC<SProps> = () => {
   return (
-    <Stack>
+    <Stack flex="1">
       <Routes>
         <Route path="/" element={<PageLayout />}>
           <Route index element={<Home />} />

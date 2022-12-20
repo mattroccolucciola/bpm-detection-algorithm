@@ -10,10 +10,14 @@ import Squigglies from "./doodle/Squigglies";
  */
 const App: React.FC<SProps> = () => {
   return (
-    <Stack flexDirection="column" sx={{ backgroundColor: "rgb(18, 19, 23)" }}>
+    <Stack
+      flexDirection="column"
+      sx={{ backgroundColor: "rgb(18, 19, 23)", height: "100vh" }}
+      justifyContent="start"
+    >
       <Squigglies zIndex={0} />
-      <Nav zIndex={1} />
-      <Body zIndex={1} />
+      <Nav />
+      <Body />
     </Stack>
   );
 };
