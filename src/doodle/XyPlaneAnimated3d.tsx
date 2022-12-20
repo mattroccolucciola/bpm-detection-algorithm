@@ -1,7 +1,7 @@
 // react
 import { useEffect, useRef } from "react";
 // state
-import { AppStore, useAppContext } from "../mobxApp";
+import { useAppContext } from "../mobxApp";
 import { observer } from "mobx-react-lite";
 // style
 import "css-doodle";

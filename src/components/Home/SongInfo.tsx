@@ -1,5 +1,5 @@
 // style
-import { Divider, Stack, Paper, Box } from "@mui/material";
+import { Divider, Stack } from "@mui/material";
 import { SProps } from "../../mui/interfaces";
 import { TG } from "../../mui/Utils";
 import { useHomeContext } from "./mobx";
