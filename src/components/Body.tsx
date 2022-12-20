@@ -45,7 +45,6 @@ const Body: React.FC<SProps> = () => {
       <Routes>
         <Route path="/" element={<PageLayout />}>
           <Route index element={<Home />} />
-          {/* <Route path="*" element={<NotFound />} /> */}
         </Route>
       </Routes>
     </Stack>
