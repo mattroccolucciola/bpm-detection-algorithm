@@ -9,6 +9,8 @@ import { SProps } from "../../mui/interfaces";
 // components
 import SongInfo from "./SongInfo";
 import Embed from "./Embed";
+import { useLayoutEffect } from "react";
+import { useAppContext } from "../../mobxApp";
 
 /** # Contains song info returned from the call by `<SongInput />`
  *
@@ -21,6 +23,12 @@ import Embed from "./Embed";
 const SongDetailDisplay: React.FC<SProps> = () => {
   // state
   const title: string = useHomeContext((s) => s.songMetrics.title);
+  const setIsAnimate = useAppContext((s) => s.setIsAnimate);
+  // effects
+  useLayoutEffect(() => {
+    console.log('title', title)
+    setIsAnimate(!!title);
+  }, [title]);
 
   return title ? (
     <Stack direction="column" component={Box} p={1}>

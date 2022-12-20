@@ -7,6 +7,7 @@ import XyPlaneAnimated3d from "../doodle/XyPlaneAnimated3d";
 /** Navigation bar top-level display component
  */
 const Nav: React.FC<SProps> = () => {
+
   return (
     <Stack
       flexDirection="row"
