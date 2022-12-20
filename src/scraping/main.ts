@@ -1,6 +1,7 @@
 import { CLIENT_ID } from "../.main.env";
+import { SongMetaData, Transcoding } from "./SongMetadata";
 
-const getSongStats = (songData: SongData) => {
+export const getSongStats = (songData: SongMetaData) => {
   const songStats: { [key in string]: any } = {};
   const songDataMap = new Map<string, string>();
   ["reposts_count", "comment_count"].forEach((key) => {
@@ -91,31 +92,11 @@ const fetchPlaylistUrl = async (
   return parsePlaylistUrl(resPlaylistJson.url);
 };
 
-const parseSongDataFromHtml = (inputHtml: string): SongData => {
-  const parser = new DOMParser();
-  const htmlScripts = parser
-    .parseFromString(inputHtml, "text/html")
-    .body.querySelectorAll("script");
-
-  // there are multiple script elements, we need to find the one with `window.__sc_hydration` in it
-  const script = [...htmlScripts].find((scriptNode: HTMLScriptElement) => {
-    // could also use: innerHTML, innerText, textContent, outerText
-    return scriptNode.text.includes("window.__sc_hydration");
-  });
-
-  const scriptStr = script?.text.split("window.__sc_hydration =")[1]!;
-  const scriptJson: any[] = JSON.parse(scriptStr);
-  const songData: SongData = scriptJson.find((elem) => {
-    return elem.hydratable && elem.hydratable === "sound";
-  }).data;
-
-  return songData;
-};
 /** # Get MP3 file and other data from song data
  *
  * @param songData
  */
-const getMp3 = async (songData: SongData) => {
+export const getMp3 = async (songData: SongMetaData) => {
   const trackHashId = songData.waveform_url
     .split("https://wave.sndcdn.com/")[1]
     .split("_m.json")[0];
@@ -138,84 +119,3 @@ const getMp3 = async (songData: SongData) => {
     CLIENT_ID
   );
 };
-
-/** Track url is validated prior to calling this.
- *
- * URL is in the form: https://soundcloud.com/${userInput}
- */
-export const getSongInfo = async (trackUrl: string) => {
-  const resolveUrl = `${trackUrl}`;
-  console.log("respolve", resolveUrl);
-
-  // send request for html
-  const infoRes = await fetch(resolveUrl, {
-    method: "GET",
-    headers: {
-      accept: "*/*",
-    },
-  });
-
-  // convert html to text
-  const htmlStr: string = await infoRes.text();
-
-  // parse html, get the song info from the script tag
-
-  const songData: SongData = parseSongDataFromHtml(htmlStr);
-  console.log("valuevalue", songData);
-
-  return songData;
-  // return getMp3(songData)
-};
-
-export interface SongData {
-  [index: string]: string | number | { transcodings: Transcoding[] };
-  genre: string;
-  title: string;
-  waveform_url: string;
-  comment_count: number;
-  duration: number;
-  id: number; // 1317984667
-  likes_count: number;
-  playback_count: number;
-  reposts_count: number;
-  release_date: string;
-  media: {
-    transcodings: Transcoding[]; // https://api-v2.soundcloud.com/media/soundcloud:tracks:1317984667/b6705d26-a662-499e-8c4b-1e922b59475c/stream/hls
-  };
-  track_authorization: string; // "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJVUyIsInN1YiI6IiIsInJpZCI6ImEyNWUzZjUyLTk0YjktNGNmZS05YmNkLWRjMmM1NzczNmVmNyIsImlhdCI6MTY2MTI4MDg3M30.NtHZS90th2v8CbYqlPkjemw9qbZZHBl2ZBCQwFnTksk";
-  artwork_url: string;
-  permalink_url: string;
-  permalink: string;
-  // created_at?: string;
-  // description?: string;
-  // embeddable_by?: string;
-  // kind?: string;
-  // last_modified?: string;
-  // license?: string;
-  // state?: string;
-  // track_format?: string;
-  // uri?: string;
-  // urn?: string;
-  // display_date?: string;
-  // tag_list?: string;
-  // download_count?: number;
-  // full_duration?: number;
-  // user_id?: number;
-  // commentable?: boolean;
-  // downloadable?: boolean;
-  // has_downloads_left?: boolean;
-  // public?: boolean;
-  // streamable?: boolean;
-  // caption?: any;
-  // label_name?: any;
-  // visuals?: any;
-  // purchase_title?: any;
-  // purchase_url?: any;
-}
-export interface Transcoding {
-  url: string; //"https://api-v2.soundcloud.com/media/soundcloud:tracks:1317984667/b6705d26-a662-499e-8c4b-1e922b59475c/stream/hls";
-  preset: string; //"mp3_1_0";
-  duration: number;
-  // quality?: string; //"sq";
-  // snipped?: boolean;
-}

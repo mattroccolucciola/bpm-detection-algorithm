@@ -5,8 +5,8 @@ import { useHomeContext } from "./mobx";
 // mui
 import { Box, Button, TextField } from "@mui/material";
 // utils
-import { getSongInfo } from "../../scraping/main";
 import { observer } from "mobx-react-lite";
+import { getSongDisplayInfo } from "../../scraping/songDisplay";
 
 export interface SongMetrics {
   [index: string]: string | number;
@@ -54,7 +54,7 @@ const urlSubmit = async (
   }
 
   // submit
-  const songData = await getSongInfo(text);
+  const songData = await getSongDisplayInfo(text);
   songMetricsSetter(songData as SongMetrics);
 
   // reset form
