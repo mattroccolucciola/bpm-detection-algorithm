@@ -30,10 +30,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "mb-move-assets": "cp -r ./assets/* ./",
     "mb-move-new-build": "mv -f ./build/* ./ && rm -rf ./build",
-    "mb-remove-old-build": "rm -rf ./static ./assets ./images",
-    "mb-manage-new-build": "yarn mb-remove-old-build && yarn mb-move-new-build && yarn mb-move-assets",
+    "mb-remove-old-build": "rm -rf ./static ./asset-manifest.json ./manifest.json robots.txt index.html",
+    "mb-manage-new-build": "yarn mb-remove-old-build && yarn mb-move-new-build",
     "build": "react-scripts build",
     "deploy": "yarn build && yarn mb-manage-new-build",
     "start:server": "nodemon --exec ts-node ./backend/index.ts"
