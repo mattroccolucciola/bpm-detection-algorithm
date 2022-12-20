@@ -32,7 +32,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "predeploy": "yarn build",
-    "deploy": "gh-pages -b main -d build",
+    "deploy": "gh-pages -d build",
     "mb-move-new-build": "mv -f ./build/* ./ && rm -rf ./build",
     "mb-remove-old-build": "rm -rf ./static ./asset-manifest.json ./manifest.json robots.txt index.html",
     "freshBuild": "yarn mb-remove-old-build && yarn predeploy && yarn mb-move-new-build",

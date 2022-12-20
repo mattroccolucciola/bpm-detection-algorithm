@@ -2,12 +2,11 @@
 import Stack from "@mui/material/Stack";
 import { TG } from "../mui/Utils";
 import { SProps } from "../mui/interfaces";
-import XyPlaneAnimated3d from "../doodle/XyPlaneAnimated3d";
+// import XyPlaneAnimated3d from "../doodle/XyPlaneAnimated3d";
 
 /** Navigation bar top-level display component
  */
 const Nav: React.FC<SProps> = () => {
-
   return (
     <Stack
       flexDirection="row"
@@ -17,7 +16,7 @@ const Nav: React.FC<SProps> = () => {
       flexWrap="nowrap"
       sx={{ height: "50px", minHeight: "50px", maxHeight: "50px" }}
     >
-      <XyPlaneAnimated3d zIndex={0} />
+      {/* <XyPlaneAnimated3d zIndex={0} /> */}
       <TG zIndex={1} color="aliceblue" wrap="nowrap" p={2} fontSize="2em">
         BDA
       </TG>

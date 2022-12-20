@@ -1,13 +1,13 @@
 {
   "files": {
     "main.css": "/bpm-detection-algorithm/static/css/main.c1d09e6d.css",
-    "main.js": "/bpm-detection-algorithm/static/js/main.876b4f0b.js",
+    "main.js": "/bpm-detection-algorithm/static/js/main.f4216541.js",
     "index.html": "/bpm-detection-algorithm/index.html",
     "main.c1d09e6d.css.map": "/bpm-detection-algorithm/static/css/main.c1d09e6d.css.map",
-    "main.876b4f0b.js.map": "/bpm-detection-algorithm/static/js/main.876b4f0b.js.map"
+    "main.f4216541.js.map": "/bpm-detection-algorithm/static/js/main.f4216541.js.map"
   },
   "entrypoints": [
     "static/css/main.c1d09e6d.css",
-    "static/js/main.876b4f0b.js"
+    "static/js/main.f4216541.js"
   ]
 }
