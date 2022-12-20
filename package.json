@@ -30,11 +30,12 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "build": "react-scripts build",
+    "predeploy": "yarn build",
+    "deploy": "gh-pages -b gh-pages -d build",
     "mb-move-new-build": "mv -f ./build/* ./ && rm -rf ./build",
     "mb-remove-old-build": "rm -rf ./static ./asset-manifest.json ./manifest.json robots.txt index.html",
-    "mb-manage-new-build": "yarn mb-remove-old-build && yarn mb-move-new-build",
-    "build": "react-scripts build",
-    "deploy": "yarn build && yarn mb-manage-new-build",
+    "freshBuild": "yarn mb-remove-old-build && yarn predeploy && yarn mb-move-new-build",
     "start:server": "nodemon --exec ts-node ./backend/index.ts"
   },
   "dependencies": {
