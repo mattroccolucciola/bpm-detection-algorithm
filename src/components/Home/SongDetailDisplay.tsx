@@ -8,7 +8,7 @@ import { SProps } from "../../mui/interfaces";
 import SongInfo from "./SongInfo";
 import Embed from "./Embed";
 import { useLayoutEffect } from "react";
-import { useAppContext } from "../../mobxApp";
+import { AppStore, useAppContext } from "../../mobxApp";
 
 /** # Contains song info returned from the call by `<SongInput />`
  *
@@ -22,9 +22,13 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   // state
   const title: string = useHomeContext((s) => s.songMetrics.title);
   const setIsAnimate = useAppContext((s) => s.setIsAnimate);
+  const setAnimateState: AppStore["setAnimateState"] = useAppContext(
+    (s) => s.setAnimateState
+  );
   // effects
   useLayoutEffect(() => {
-    setIsAnimate(!!title);
+    // setIsAnimate(!!title);
+    title && setAnimateState("success, pending");
   }, [title]);
 
   return title ? (

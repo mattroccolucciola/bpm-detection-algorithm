@@ -48,7 +48,7 @@ const urlSubmit = async (
   let validatedInput = text;
   // validate
   if (!text.includes("soundcloud.com/")) {
-    errorSetter("Error with url" + validatedInput);
+    errorSetter("Error: URL not valid.  " + `(input: "${validatedInput}")`);
     return;
   }
 
@@ -62,7 +62,7 @@ const urlSubmit = async (
 };
 
 const example =
-  "https://soundcloud.com/octobersveryown/drake-21-savage-rich-flex";
+  "https://soundcloud.com/inspected/sam-gellaitry-waiting-so-long";
 
 /** Displays information about input to the fetch call
  */
@@ -85,7 +85,7 @@ const SongInput: React.FC = () => {
         fullWidth
         error={errorInput !== ""}
         helperText={errorInput}
-        label="Soundcloud Song URL/slug"
+        label="Soundcloud Song URL"
       />
       <Button
         variant="contained"

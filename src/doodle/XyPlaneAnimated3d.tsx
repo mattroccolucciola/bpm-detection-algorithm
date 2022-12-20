@@ -1,7 +1,7 @@
 // react
 import { useEffect, useRef } from "react";
 // state
-import { useAppContext } from "../mobxApp";
+import { AppStore, useAppContext } from "../mobxApp";
 import { observer } from "mobx-react-lite";
 // style
 import "css-doodle";
@@ -12,9 +12,17 @@ import Doodle from ".";
 /** Displays a 3d grid
  */
 const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
+  // state
   const isAnimate = useAppContext((s) => s.isAnimate);
+  // const setIsAnimate = useAppContext((s) => s.setIsAnimate);
+  const animateState = useAppContext((s) => s.animateState);
+  const setAnimateState: AppStore["setAnimateState"] = useAppContext(
+    (s) => s.setAnimateState
+  );
   const doodleRef = useRef<HTMLDivElement>(null);
 
+  const fwdAnimation = "success";
+  const revAnimation = "pending";
   // WARNING: this is VERY hacky and I need to choose a new library if I want easy access to properties / dont want to deal with shadow dom
   useEffect(() => {
     const shadowRoot = document.querySelector(
@@ -25,10 +33,15 @@ const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
       | undefined;
     if (gridCellElems) {
       gridCellElems.forEach((gridCell: HTMLElement) => {
-        gridCell.style.animationName = isAnimate && "scale";
+        gridCell.style.animationName = animateState;
+        gridCell.onanimationend = () => {
+          // setAnimateState(revAnimation);
+          // gridCellElems[gridCellElems.length - 1].style.animationName =
+          //   revAnimation;
+        };
       });
     }
-  }, [isAnimate, doodleRef.current]);
+  }, [animateState, doodleRef.current]);
 
   return (
     <Doodle
@@ -71,22 +84,27 @@ const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
         height: 20px;
         width:  25px;
         border: 0.1px solid slateblue;
-        transform: rotate(calc(50deg * @row * @col / @size));
+        transform: rotate(calc(150deg * @row * @col / @size));
 
-        --scaledelay: calc(( ( @row/@size-row ) * ( @col/@size-col )) * 1s);
-        animation-delay: var(--scaledelay);
-        animation-duration: .7s;
-        animation-iteration-count: 1;
-        animation-timing-function: ease-in-out;
-        animation-fill-mode: forwards;
+        --startState: calc(150deg * ((@row * @col) / @size));
+        --${fwdAnimation}delay: calc(( ( @row/@size-row ) * ( @col/@size-col )) * 1s);
+        --${revAnimation}delay: calc(( ( @row/@size-row ) * ( @col/@size-col )) * 2s + 0.5s);
+        
+        animation-delay:           var(--${fwdAnimation}delay), var(--${revAnimation}delay);
+        animation-duration:        .6s, 10s;
+        animation-direction:       normal, normal;
+        animation-iteration-count: 1, 1;
+        animation-timing-function: ease-in-out, ease-out;
+        animation-fill-mode:       forwards, none;
 
-        @keyframes scale {
-          0%{
-            transform: rotate(calc(50deg * @row * @col / @size));
-          }
+        @keyframes ${fwdAnimation} {
           100%{
-            transform: rotate(calc(400deg + (50deg * ((@row * @col) / @size))));
+            transform: rotate(calc(150deg + var(--startState)));
           }
+        }
+        @keyframes ${revAnimation} {
+          0% { transform: rotate(calc(150deg + var(--startState))); }
+          100% { transform: rotate(calc(-180deg + (150deg + var(--startState)))); }
         }
       `}
     </Doodle>
