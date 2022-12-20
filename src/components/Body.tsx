@@ -4,6 +4,7 @@ import { Outlet, Route, Routes } from "react-router-dom";
 import { Stack, useTheme } from "@mui/material";
 // components
 import Home from "./Home";
+import { SProps } from "../mui/interfaces";
 
 /** The default layout for the page. To be applied to all routes.
  */
@@ -26,7 +27,6 @@ const PageLayout: React.FC = () => {
           width: "100%",
           maxWidth: { xs: "100%", lg: theme.breakpoints.values.lg },
         },
-        background: "grey",
       }}
     >
       <Outlet />
@@ -39,7 +39,7 @@ const PageLayout: React.FC = () => {
  * Displays the application's content and sits immediately below the navbar.\
  * Scrolling occurs internally. Set in PageLayout component
  */
-const Body = () => {
+const Body: React.FC<SProps> = () => {
   return (
     <Stack>
       <Routes>

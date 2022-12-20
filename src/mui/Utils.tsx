@@ -9,4 +9,4 @@ import { Grid2Props as GridProps } from "@mui/material";
  */
 export const TG: React.FC<GridProps & { component?: React.ElementType }> = ({
   ...p
-}) => <Grid component={Typography} {...p} />;
+}) => <Grid component={Typography} padding="6px" {...p} />;

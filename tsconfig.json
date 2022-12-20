@@ -20,7 +20,9 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": [],
+    "typeRoots": ["@types"]
   },
-  "include": ["src"]
+  "include": ["src", "@types"]
 }

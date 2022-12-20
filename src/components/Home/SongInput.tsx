@@ -78,7 +78,6 @@ const SongInput: React.FC = () => {
         placeholder="https://soundcloud.com/<artist>/<track-name>"
         value={textInput}
         onChange={onChangeUpdateText(setTextInput)}
-        color="secondary"
         onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
           if (e.key === "Enter")
             urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics);
