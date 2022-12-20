@@ -2,9 +2,7 @@
 import { observer } from "mobx-react-lite";
 import { useHomeContext } from "./mobx";
 // mui
-import { Stack, Paper, Box } from "@mui/material";
-import Grid from "@mui/material/Unstable_Grid2/Grid2";
-import { TG } from "../../mui/Utils";
+import { Stack, Box } from "@mui/material";
 import { SProps } from "../../mui/interfaces";
 // components
 import SongInfo from "./SongInfo";
@@ -26,7 +24,6 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   const setIsAnimate = useAppContext((s) => s.setIsAnimate);
   // effects
   useLayoutEffect(() => {
-    console.log('title', title)
     setIsAnimate(!!title);
   }, [title]);
 

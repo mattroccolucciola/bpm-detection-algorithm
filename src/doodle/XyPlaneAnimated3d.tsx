@@ -1,12 +1,16 @@
-import "css-doodle";
+// react
+import { useEffect, useRef } from "react";
+// state
+import { useAppContext } from "../mobxApp";
+import { observer } from "mobx-react-lite";
 // style
+import "css-doodle";
 import { SProps } from "../mui/interfaces";
 // components
 import Doodle from ".";
-import { useEffect, useRef } from "react";
-import { useAppContext } from "../mobxApp";
-import { observer } from "mobx-react-lite";
 
+/** Displays a 3d grid
+ */
 const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
   const isAnimate = useAppContext((s) => s.isAnimate);
   const doodleRef = useRef<HTMLDivElement>(null);
@@ -70,21 +74,18 @@ const XyPlaneAnimated3d: React.FC<SProps> = ({ ...p }) => {
         transform: rotate(calc(50deg * @row * @col / @size));
 
         --scaledelay: calc(( ( @row/@size-row ) * ( @col/@size-col )) * 1s);
-          
-        
         animation-delay: var(--scaledelay);
-        animation-duration: 1s;
+        animation-duration: .7s;
         animation-iteration-count: 1;
         animation-timing-function: ease-in-out;
         animation-fill-mode: forwards;
-        
 
         @keyframes scale {
           0%{
             transform: rotate(calc(50deg * @row * @col / @size));
           }
           100%{
-            transform: rotate(calc(90deg + 50deg * @row * @col / @size));
+            transform: rotate(calc(400deg + (50deg * ((@row * @col) / @size))));
           }
         }
       `}
