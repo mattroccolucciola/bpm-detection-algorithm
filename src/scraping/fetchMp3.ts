@@ -1,10 +1,12 @@
 import { CLIENT_ID } from "../.main.env";
+import { calculateBPM } from "./bpmDetection";
+import { decodeAndAnalyzeBuffer } from "./processAudio";
 import { SongMetrics, Transcoding } from "./SongMetadata";
 
 const apiV2BaseUrl = "https://api-v2.soundcloud.com";
 const mediaBaseUrl = "https://cf-hls-media.sndcdn.com";
 const desiredSampleRate = 44100;
-const sampleRate = desiredSampleRate;
+export const sampleRate = desiredSampleRate;
 
 /**
  * https://api-v2.soundcloud.com/media/soundcloud:tracks:170734376/d7cb779d-d356-4bbf-b799-c6944eae0829/stream/hls
@@ -53,141 +55,10 @@ const fetchMp3Url = async (songMetadata: SongMetrics): Promise<string> => {
   return mp3UrlJson.url;
 };
 
-const bufferErrorCallback = (e: DOMException) => {
-  console.log("Error with decoding audio data" + e);
-};
 
-const countIntervalsBetweenNearbyPeaks = (peaksArr: number[]) => {
-  const intervalCountArray: { interval: number; count: number }[] = [];
-  peaksArr.forEach(function (_peak_, idx) {
-    for (let i = 0; i < 10; i++) {
-      const interval: number = peaksArr[idx + i] - _peak_;
-      const foundInterval: boolean = intervalCountArray.some(function (
-        intervalCount
-      ) {
-        if (intervalCount.interval === interval) return intervalCount.count++;
-      });
-      //Additional checks to avoid infinite loops in later processing
-      if (!isNaN(interval) && interval !== 0 && !foundInterval) {
-        intervalCountArray.push({ interval: interval, count: 1 });
-      }
-    }
-  });
-  return intervalCountArray;
-};
 
-const getPeaksAtThreshold = (
-  buffer: Float32Array,
-  thresh: number
-): number[] => {
-  const peaksArray: number[] = [];
-  for (let i = 0; i < buffer.length; i++) {
-    if (buffer[i] > thresh) {
-      peaksArray.push(i); // if value > threshold, it's a peak -> add the index of this value to list
-      i += 0.25 * sampleRate;
-    }
-  }
-  return peaksArray;
-};
-const calculateBPM = (audioBufferArray: Float32Array) => {
-  const arrMax: number = audioBufferArray.reduce(
-    (max, value) => (value > max ? value : max),
-    audioBufferArray[0]
-  );
-  const arrMin: number = audioBufferArray.reduce(
-    (min, value) => (value < min ? value : min),
-    audioBufferArray[0]
-  );
 
-  // set initial threshold, to be reduced via while loop
-  let thresholdPct = 0.9;
-  let threshold = arrMin + (arrMax - arrMin) * thresholdPct;
 
-  // get the array of peak locations, borrowed from https://stackoverflow.com/a/30112800
-  let peaksArr = getPeaksAtThreshold(audioBufferArray, threshold);
-  let intervalCountArr = countIntervalsBetweenNearbyPeaks(peaksArr);
-  let tempoCountArr = groupNeighborsByTempo(intervalCountArr);
-  tempoCountArr.sort(function (a, b) {
-    return b.count - a.count;
-  });
-
-  weightedAvg = calcWeightedAvg(tempoCountArr);
-  console.log(
-    `calculated bpm: ${tempoCountArr[0]["tempo"]}    |||    weighted avg: ${weightedAvg}`,
-    tempoCountArr
-  );
-
-  if (tempoCountArr.length) {
-    bpm = tempoCountArr[0].tempo;
-    bpmText.innerHTML = bpm;
-    if (bpm > 110 && bpm < 130) {
-      genreEstText.innerText = "Dance";
-    }
-  }
-};
-
-// ((this: OfflineAudioContext, ev: OfflineAudioCompletionEvent) => any
-const renderBufferAndCalcBPM = () =>
-  function (
-    this: OfflineAudioContext,
-    offlineAudioCompletionEvent: OfflineAudioCompletionEvent
-  ) {
-    const filteredBuffer: AudioBuffer =
-      offlineAudioCompletionEvent.renderedBuffer;
-
-    // If you want to analyze both channels, use the other channel later
-    const audioBufferArray: Float32Array = filteredBuffer.getChannelData(0);
-
-    // algo to calculate bpm
-    calculateBPM(audioBufferArray);
-  };
-
-/**
- * @todo rename
- */
-const decodeBuffer = (audioCtx: AudioContext, buffer: AudioBuffer) => {
-  // connect AudioContext node to the source object
-  const audioCtxSrc = audioCtx.createBufferSource();
-  audioCtxSrc.buffer = buffer;
-  audioCtxSrc.connect(audioCtx.destination);
-  audioCtxSrc.loop = true;
-
-  //let offlineContext = new OfflineAudioContext(1, buffer.length, buffer.sampleRate);
-  let offlineContext = new OfflineAudioContext(1, buffer.length, sampleRate);
-  let oSource = offlineContext.createBufferSource();
-  oSource.buffer = buffer;
-  let filter = offlineContext.createBiquadFilter();
-  filter.frequency.value = 150;
-  filter.type = "lowpass";
-  oSource.connect(filter);
-  filter.connect(offlineContext.destination);
-  oSource.start(0);
-  offlineContext.startRendering();
-  return offlineContext;
-};
-
-/**
- * @todo rename
- */
-const decodeThenAnalyzeBuffer: (_: AudioContext) => DecodeSuccessCallback =
-  (audioCtx: AudioContext) => (buffer: AudioBuffer) => {
-    const offlineCtx: OfflineAudioContext = decodeBuffer(audioCtx, buffer);
-
-    if (offlineCtx.sampleRate !== sampleRate)
-      throw new Error(`Sample rate for offline context is not ${sampleRate}`);
-
-    offlineCtx.oncomplete = renderBufferAndCalcBPM;
-  };
-
-const decodeAndAnalyzeBuffer = (audioCtx: AudioContext) =>
-  function (this: XMLHttpRequest, e: ProgressEvent<EventTarget>) {
-    const audioData: ArrayBuffer = this.response;
-    audioCtx.decodeAudioData(
-      audioData,
-      decodeThenAnalyzeBuffer(audioCtx),
-      bufferErrorCallback
-    );
-  };
 const analyzeSongBPM = async (
   audioCtx: AudioContext,
   mp3Url: string,
@@ -203,7 +74,6 @@ const analyzeSongBPM = async (
   await req.send();
   const audioBufferNode = audioCtx.createBufferSource();
 };
-const buildRequest = async () => {};
 
 /** # Initialize audio context.
  *
