@@ -1,6 +1,6 @@
 import { CLIENT_ID } from "../.main.env";
 import { calculateBPM } from "./bpmDetection";
-import { decodeAndAnalyzeBuffer } from "./processAudio";
+import { processMp3 } from "./processAudio";
 import { SongMetrics, Transcoding } from "./SongMetadata";
 
 const apiV2BaseUrl = "https://api-v2.soundcloud.com";
@@ -55,11 +55,7 @@ const fetchMp3Url = async (songMetadata: SongMetrics): Promise<string> => {
   return mp3UrlJson.url;
 };
 
-
-
-
-
-const analyzeSongBPM = async (
+const analyzeSongBPM_ = async (
   audioCtx: AudioContext,
   mp3Url: string,
   mp3FileRes: Response
@@ -70,46 +66,23 @@ const analyzeSongBPM = async (
   let req = new XMLHttpRequest();
   req.open("GET", mp3Url, true);
   req.responseType = "arraybuffer";
-  req.onload = decodeAndAnalyzeBuffer(audioCtx);
+  // req.onload = decodeAndAnalyzeBuffer_(audioCtx);
   await req.send();
-  const audioBufferNode = audioCtx.createBufferSource();
-};
-
-/** # Initialize audio context.
- *
- * Throwing an error if device not supported.
- */
-const initAudioContext = (): AudioContext => {
-  // Check if hack is necessary. Only occurs in iOS6+ devices
-  // and only when you first boot the iPhone, or play a audio/video
-  // with a different sample rate
-  if (
-    /(iPhone|iPad)/i.test(navigator.userAgent) &&
-    new window.AudioContext().sampleRate !== sampleRate
-  ) {
-    let audioCtx = new window.AudioContext();
-    const buffer = audioCtx.createBuffer(1, 1, sampleRate);
-
-    const dummy = audioCtx.createBufferSource();
-    dummy.buffer = buffer;
-    dummy.connect(audioCtx.destination);
-    dummy.start(0);
-    dummy.disconnect();
-
-    audioCtx.close(); // dispose old context
-    throw new Error("Device not supported");
-    // return new AudioContext();
-  } else return new window.AudioContext();
+  // const audioBufferNode = audioCtx.createBufferSource();
 };
 
 /**
  * ## Get the mp3 file
  */
-export const fetchMp3 = async (songMetadata: SongMetrics): Promise<any> => {
+export const fetchMp3ProcessCalculateBpm = async (
+  songMetadata: SongMetrics
+): Promise<any> => {
+  // 1. fetch
   const mp3Url: string = await fetchMp3Url(songMetadata);
   const mp3FileRes = await fetch(mp3Url);
   console.log("mp3FileRes", mp3FileRes);
-  const audioCtx = initAudioContext();
-  await analyzeSongBPM(audioCtx, mp3Url, mp3FileRes);
+  // process
+  await processMp3(mp3FileRes);
+  // calculate
   // return song;
 };

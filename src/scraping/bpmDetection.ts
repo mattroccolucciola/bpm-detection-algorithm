@@ -135,5 +135,6 @@ export const calculateBPM = (audioBufferArray: Float32Array): number => {
       // genreEstText.innerText = "Dance";
     }
   }
+  console.log("weighted avg");
   return weightedAvg;
 };

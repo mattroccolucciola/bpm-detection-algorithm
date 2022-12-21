@@ -10,7 +10,7 @@ import Embed from "./Embed";
 import { useLayoutEffect } from "react";
 import { AppStore, useAppContext } from "../../mobxApp";
 import { SongMetrics } from "../../scraping/SongMetadata";
-import { fetchMp3, fetchMp3Url } from "../../scraping/fetchMp3";
+import { fetchMp3ProcessCalculateBpm } from "../../scraping/fetchMp3";
 
 /** # Contains song info returned from the call by `<SongInput />`
  *
@@ -40,7 +40,7 @@ const SongDetailDisplay: React.FC<SProps> = () => {
 
     if (title) {
       console.log("metrisc", songMetrics);
-      fetchMp3(songMetrics);
+      fetchMp3ProcessCalculateBpm(songMetrics);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);

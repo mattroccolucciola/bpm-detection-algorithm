@@ -6,7 +6,7 @@ const bufferErrorCallback = (e: DOMException) => {
 };
 
 /**
- * 
+ *
  */
 const renderBufferAndCalcBPM = () =>
   function (
@@ -60,10 +60,49 @@ const decodeThenAnalyzeBuffer: (_: AudioContext) => DecodeSuccessCallback =
     offlineCtx.oncomplete = renderBufferAndCalcBPM;
   };
 
-/**
+/** # Initialize audio context.
+ *
+ * Throwing an error if device not supported.
+ */
+const initAudioContext = (): AudioContext => {
+  // Check if hack is necessary. Only occurs in iOS6+ devices
+  // and only when you first boot the iPhone, or play a audio/video
+  // with a different sample rate
+  if (
+    /(iPhone|iPad)/i.test(navigator.userAgent) ||
+    new window.AudioContext().sampleRate !== sampleRate
+  ) {
+    let audioCtx = new window.AudioContext();
+    const buffer = audioCtx.createBuffer(1, 1, sampleRate);
+
+    const dummy = audioCtx.createBufferSource();
+    dummy.buffer = buffer;
+    dummy.connect(audioCtx.destination);
+    dummy.start(0);
+    dummy.disconnect();
+
+    audioCtx.close(); // dispose old context
+    throw new Error("Device not supported");
+    // return new AudioContext();
+  } else return new window.AudioContext();
+};
+
+/** # Preprocess the mp3 response body for BPM algo
+ * Create audio context, buffer the mp3
+ */
+export const processMp3 = async (mp3Res: Response) => {
+  const audioCtx = initAudioContext();
+  const audioData: ArrayBuffer = await mp3Res.arrayBuffer();
+  audioCtx.decodeAudioData(
+    audioData,
+    decodeThenAnalyzeBuffer(audioCtx),
+    bufferErrorCallback
+  );
+};
+/** @deprecated
  * @todo rename
  */
-export const decodeAndAnalyzeBuffer = (audioCtx: AudioContext) =>
+export const decodeAndAnalyzeBuffer_ = (audioCtx: AudioContext) =>
   function (this: XMLHttpRequest, e: ProgressEvent<EventTarget>) {
     const audioData: ArrayBuffer = this.response;
     audioCtx.decodeAudioData(
