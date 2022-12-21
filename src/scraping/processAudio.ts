@@ -2,7 +2,7 @@ import { calculateBPM } from "./bpmDetection";
 import { sampleRate } from "./fetchMp3";
 
 const bufferErrorCallback = (e: DOMException) => {
-  console.log("Error with decoding audio data" + e);
+  console.error("Error with decoding audio data" + e);
 };
 
 /**
@@ -65,44 +65,46 @@ const decodeThenAnalyzeBuffer = (
 /** @deprecated
  * @todo rename
  */
-const decodeThenAnalyzeBuffer_: (_: AudioContext) => DecodeSuccessCallback =
-  (audioCtx: AudioContext) => (decodedBuffer: AudioBuffer) => {
-    const offlineCtx: OfflineAudioContext = decodeBuffer(
-      audioCtx,
-      decodedBuffer
-    );
+const decodeThenAnalyzeBuffer_: DecodeSuccessCallback = (
+  decodedBuffer: AudioBuffer
+) => {
+  console.log("legacy decode then analyze buffer");
+  const audioCtx = new AudioContext({ sampleRate });
+  console.log("audio context:\n", audioCtx);
+  console.log("legacy buffer:\n", decodedBuffer);
+  const offlineCtx: OfflineAudioContext = decodeBuffer(audioCtx, decodedBuffer);
+  console.log("legacy offlineCtx from `decodeBuffer()`:\n", offlineCtx);
 
-    if (offlineCtx.sampleRate !== sampleRate)
-      throw new Error(`Sample rate for offline context is not ${sampleRate}`);
+  if (offlineCtx.sampleRate !== sampleRate)
+    throw new Error(`Sample rate for offline context is not ${sampleRate}`);
 
-    offlineCtx.oncomplete = renderBufferAndCalcBPM;
-  };
+  console.log("now rendering...");
+  offlineCtx.oncomplete = renderBufferAndCalcBPM;
+};
+// const decodeThenAnalyzeBuffer_: (_: AudioContext) => DecodeSuccessCallback =
+//   (audioCtx: AudioContext) => (decodedBuffer: AudioBuffer) => {
+//     console.log("legacy decode then analyze buffer");
+//     console.log("audio context:\n", audioCtx);
+//     console.log("legacy buffer:\n", decodedBuffer);
+//     const offlineCtx: OfflineAudioContext = decodeBuffer(
+//       audioCtx,
+//       decodedBuffer
+//     );
+//     console.log("legacy offlineCtx from `decodeBuffer()`:\n", offlineCtx);
+
+//     if (offlineCtx.sampleRate !== sampleRate)
+//       throw new Error(`Sample rate for offline context is not ${sampleRate}`);
+
+//     console.log("now rendering...");
+//     offlineCtx.oncomplete = renderBufferAndCalcBPM;
+//   };
 
 /** # Initialize audio context.
  *
  * Throwing an error if device not supported.
  */
 const initAudioContext = (): AudioContext => {
-  // Check if hack is necessary. Only occurs in iOS6+ devices
-  // and only when you first boot the iPhone, or play a audio/video
-  // with a different sample rate
-  if (
-    /(iPhone|iPad)/i.test(navigator.userAgent) ||
-    new window.AudioContext().sampleRate !== sampleRate
-  ) {
-    let audioCtx = new window.AudioContext();
-    const buffer = audioCtx.createBuffer(1, 1, sampleRate);
-
-    const dummy = audioCtx.createBufferSource();
-    dummy.buffer = buffer;
-    dummy.connect(audioCtx.destination);
-    dummy.start(0);
-    dummy.disconnect();
-
-    audioCtx.close(); // dispose old context
-    throw new Error("Device not supported");
-    // return new AudioContext();
-  } else return new window.AudioContext();
+  return new window.AudioContext({ sampleRate });
 };
 
 /** # Preprocess the mp3 response object for BPM algo
@@ -112,26 +114,36 @@ const initAudioContext = (): AudioContext => {
  */
 export const processMp3 = async (mp3Res: Response) => {
   const audioCtx = initAudioContext();
-  const audioData: ArrayBuffer = await mp3Res.arrayBuffer();
+  // audioCtx.createBufferSource().buffer;
 
-  const logic = 0;
+  const audioData: ArrayBuffer = await mp3Res.arrayBuffer();
+  console.log("audioData", audioData);
+
+  const logic: number = 0;
   if (logic === 0) {
+    console.log("going with logic ", logic);
     audioCtx.decodeAudioData(
       audioData,
-      decodeThenAnalyzeBuffer_(audioCtx),
+      // decodeThenAnalyzeBuffer_(audioCtx),
+      decodeThenAnalyzeBuffer_,
       bufferErrorCallback
     );
   } else if (logic === 1) {
+    console.log("going with logic ", logic);
     const xxx = await audioCtx.decodeAudioData(
       audioData,
-      decodeThenAnalyzeBuffer_(audioCtx),
+      // decodeThenAnalyzeBuffer_(audioCtx),
+      decodeThenAnalyzeBuffer_,
       bufferErrorCallback
     );
   } else if (logic === 2) {
+    console.log("going with logic ", logic);
     try {
       const decodedBuffer = await audioCtx.decodeAudioData(audioData);
+      console.log("successfully decoded buffer", decodedBuffer);
       // currently here
       decodeThenAnalyzeBuffer(audioCtx, decodedBuffer);
+      console.log("successfully `analyzed` buffer");
     } catch (err) {
       bufferErrorCallback(err as DOMException);
     }
@@ -140,12 +152,31 @@ export const processMp3 = async (mp3Res: Response) => {
 /** @deprecated
  * @todo rename
  */
-export const decodeAndAnalyzeBuffer_ = (audioCtx: AudioContext) =>
-  function (this: XMLHttpRequest, e: ProgressEvent<EventTarget>) {
-    const audioData: ArrayBuffer = this.response;
-    audioCtx.decodeAudioData(
-      audioData,
-      decodeThenAnalyzeBuffer_(audioCtx),
-      bufferErrorCallback
-    );
-  };
+export const decodeAndAnalyzeBuffer_ = function (
+  this: XMLHttpRequest,
+  e: ProgressEvent<EventTarget>
+) {
+  console.log('here 1')
+  const audioCtx = new AudioContext();
+  console.log('here 2')
+  const audioData: ArrayBuffer = this.response;
+  console.log('here 3: audio data', audioData)
+  console.log('e',e);
+  
+  audioCtx.decodeAudioData(
+    audioData,
+    // decodeThenAnalyzeBuffer_(audioCtx),
+    decodeThenAnalyzeBuffer_,
+    bufferErrorCallback
+  );
+};
+// export const decodeAndAnalyzeBuffer_ = (audioCtx: AudioContext) =>
+//   function (this: XMLHttpRequest, e: ProgressEvent<EventTarget>) {
+//     const audioData: ArrayBuffer = this.response;
+//     audioCtx.decodeAudioData(
+//       audioData,
+//       // decodeThenAnalyzeBuffer_(audioCtx),
+//       decodeThenAnalyzeBuffer_,
+//       bufferErrorCallback
+//     );
+//   };
