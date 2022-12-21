@@ -50,9 +50,27 @@ const decodeBuffer = (audioCtx: AudioContext, buffer: AudioBuffer) => {
 /**
  * @todo rename
  */
-const decodeThenAnalyzeBuffer: (_: AudioContext) => DecodeSuccessCallback =
-  (audioCtx: AudioContext) => (buffer: AudioBuffer) => {
-    const offlineCtx: OfflineAudioContext = decodeBuffer(audioCtx, buffer);
+const decodeThenAnalyzeBuffer = (
+  audioCtx: AudioContext,
+  decodedBuffer: AudioBuffer
+) => {
+  const offlineCtx: OfflineAudioContext = decodeBuffer(audioCtx, decodedBuffer);
+
+  if (offlineCtx.sampleRate !== sampleRate)
+    throw new Error(`Sample rate for offline context is not ${sampleRate}`);
+
+  offlineCtx.oncomplete = renderBufferAndCalcBPM;
+};
+
+/** @deprecated
+ * @todo rename
+ */
+const decodeThenAnalyzeBuffer_: (_: AudioContext) => DecodeSuccessCallback =
+  (audioCtx: AudioContext) => (decodedBuffer: AudioBuffer) => {
+    const offlineCtx: OfflineAudioContext = decodeBuffer(
+      audioCtx,
+      decodedBuffer
+    );
 
     if (offlineCtx.sampleRate !== sampleRate)
       throw new Error(`Sample rate for offline context is not ${sampleRate}`);
@@ -87,17 +105,37 @@ const initAudioContext = (): AudioContext => {
   } else return new window.AudioContext();
 };
 
-/** # Preprocess the mp3 response body for BPM algo
+/** # Preprocess the mp3 response object for BPM algo
+ * Pass in the response which contains mp3, return audio context for BPM processing.
+ *
  * Create audio context, buffer the mp3
  */
 export const processMp3 = async (mp3Res: Response) => {
   const audioCtx = initAudioContext();
   const audioData: ArrayBuffer = await mp3Res.arrayBuffer();
-  audioCtx.decodeAudioData(
-    audioData,
-    decodeThenAnalyzeBuffer(audioCtx),
-    bufferErrorCallback
-  );
+
+  const logic = 0;
+  if (logic === 0) {
+    audioCtx.decodeAudioData(
+      audioData,
+      decodeThenAnalyzeBuffer_(audioCtx),
+      bufferErrorCallback
+    );
+  } else if (logic === 1) {
+    const xxx = await audioCtx.decodeAudioData(
+      audioData,
+      decodeThenAnalyzeBuffer_(audioCtx),
+      bufferErrorCallback
+    );
+  } else if (logic === 2) {
+    try {
+      const decodedBuffer = await audioCtx.decodeAudioData(audioData);
+      // currently here
+      decodeThenAnalyzeBuffer(audioCtx, decodedBuffer);
+    } catch (err) {
+      bufferErrorCallback(err as DOMException);
+    }
+  }
 };
 /** @deprecated
  * @todo rename
@@ -107,7 +145,7 @@ export const decodeAndAnalyzeBuffer_ = (audioCtx: AudioContext) =>
     const audioData: ArrayBuffer = this.response;
     audioCtx.decodeAudioData(
       audioData,
-      decodeThenAnalyzeBuffer(audioCtx),
+      decodeThenAnalyzeBuffer_(audioCtx),
       bufferErrorCallback
     );
   };
