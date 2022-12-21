@@ -1,7 +1,5 @@
 import { CLIENT_ID } from "../.main.env";
-import { SongMetrics } from "../components/Home/SongInput";
-import { parseTrackHashFromMetadata } from "./fetchMp3";
-import { SongResJson, Transcoding } from "./SongMetadata";
+import { SongMetrics, SongResJson, Transcoding } from "./SongMetadata";
 
 export const getSongStats = (songData: SongResJson) => {
   const songStats: { [key in string]: any } = {};
@@ -82,11 +80,7 @@ const fetchPlaylistUrl = async (
   trackAuth: string,
   clientId: string
 ): Promise<PlaylistPayload> => {
-  const playlistCallUrl = buildSignedPlaylistCall(
-    trackId,
-    trackHls,
-    trackAuth,
-  );
+  const playlistCallUrl = buildSignedPlaylistCall(trackId, trackHls, trackAuth);
 
   // fetch
   if (playlistCallUrl) console.log("fetching:", playlistCallUrl);
@@ -145,7 +139,6 @@ export const getMp3 = async (songMetadata: SongMetrics) => {
     */
   // const trackHash = parseTrackHashFromMetadata(songMetadata);
   // const x = await fetchMp3Url(songMetadata)
-
   // const trackAuth: string = songMetadata.track_authorization;
   // const playlistCallUrl = buildSignedPlaylistCall(
   //   songMetadata.id,
@@ -158,7 +151,6 @@ export const getMp3 = async (songMetadata: SongMetrics) => {
   //   d7cb779d-d356-4bbf-b799-c6944eae0829/stream/hls?
   //   client_id=0K8gqs6E9DAVUafZxVq6xIIVVjtIgXTv&
   //   track_authorization=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJnZW8iOiJVUyIsInN1YiI6IiIsInJpZCI6ImZiOTJkOWRmLWRhMjEtNDI3OC1iZWQxLTE1YWZhMjIxMjdkZCIsImlhdCI6MTY3MTU4Njg3Mn0.nMqIe3ZvOgmRI3bnakQAqsmeCZiwcimd2868Reysj-g
-
   // streamData = await pullMp3URL(`https://api.soundcloud.com/resolve?url=${trackURL}&client_id=${CLIENT_ID}`);
   // // pullMp3URL
   // resJSON = await _get(url);

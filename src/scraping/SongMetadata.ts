@@ -1,3 +1,22 @@
+export interface SongMetrics {
+  [index: string]: string | number | { transcodings: Transcoding[] };
+  genre: string;
+  waveform_url: string;
+  comment_count: number;
+  likes_count: number;
+  playback_count: number;
+  reposts_count: number;
+  title: string;
+  artwork_url: string;
+  permalink_url: string;
+  permalink: string;
+  id: number;
+  track_authorization: string;
+  media: {
+    transcodings: Transcoding[]; // used in https://api-v2.soundcloud.com/media/soundcloud:tracks:1317984667/b6705d26-a662-499e-8c4b-1e922b59475c/stream/hls
+  };
+}
+
 /** # Song metadata for responses from soundcloud
  *
  */
