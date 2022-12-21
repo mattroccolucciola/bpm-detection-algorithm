@@ -1,6 +1,7 @@
 // state
 import { makeAutoObservable } from "mobx";
 import { createContext, useContext } from "react";
+import { SongResJson } from "../../scraping/SongMetadata";
 import { SongMetrics } from "./SongInput";
 
 /** # Main */
@@ -13,6 +14,7 @@ export class HomeStore {
   /////////////////////////////////////////////////////////
   ////////////////////// OBSERVABLES //////////////////////
   songMetrics = {} as SongMetrics;
+  songMetadata = {} as SongResJson;
   ////////////////////// OBSERVABLES //////////////////////
   /////////////////////////////////////////////////////////
 
@@ -25,6 +27,9 @@ export class HomeStore {
   //////////////////////// ACTIONS ////////////////////////
   setSongMetrics(input: SongMetrics) {
     this.songMetrics = input;
+  }
+  setSongMetadata(input: SongResJson) {
+    this.songMetadata = input;
   }
   //////////////////////// ACTIONS ////////////////////////
   /////////////////////////////////////////////////////////

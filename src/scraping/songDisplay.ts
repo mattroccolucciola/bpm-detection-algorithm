@@ -1,6 +1,6 @@
-import { SongMetaData } from "./SongMetadata";
+import { SongResJson } from "./SongMetadata";
 
-const parseSongDisplayDataFromHtml = (inputHtml: string): SongMetaData => {
+const parseSongDisplayDataFromHtml = (inputHtml: string): SongResJson => {
   const parser = new DOMParser();
   const htmlScripts = parser
     .parseFromString(inputHtml, "text/html")
@@ -14,11 +14,11 @@ const parseSongDisplayDataFromHtml = (inputHtml: string): SongMetaData => {
 
   const scriptStr = script?.text.split("window.__sc_hydration =")[1]!;
   const scriptJson: any[] = JSON.parse(scriptStr);
-  const songData: SongMetaData = scriptJson.find((elem) => {
+  const songMetadata: SongResJson = scriptJson.find((elem) => {
     return elem.hydratable && elem.hydratable === "sound";
   }).data;
 
-  return songData;
+  return songMetadata;
 };
 
 /** # ENTRYPOINT: Track url is validated prior to calling this.
@@ -46,8 +46,7 @@ export const getSongDisplayInfo = async (trackUrl: string) => {
   const htmlStr: string = await infoRes.text();
 
   // parse html, get the song info from the script tag
-
-  const songData: SongMetaData = parseSongDisplayDataFromHtml(htmlStr);
+  const songData: SongResJson = parseSongDisplayDataFromHtml(htmlStr);
   console.log("valuevalue", songData);
 
   return songData;

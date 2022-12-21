@@ -1,15 +1,16 @@
 // react
 import { useState } from "react";
 // state
+import { observer } from "mobx-react-lite";
 import { useHomeContext } from "./mobx";
 // mui
 import { Box, Button, TextField } from "@mui/material";
 // utils
-import { observer } from "mobx-react-lite";
 import { getSongDisplayInfo } from "../../scraping/songDisplay";
+import { SongResJson, Transcoding } from "../../scraping/SongMetadata";
 
 export interface SongMetrics {
-  [index: string]: string | number;
+  [index: string]: string | number | { transcodings: Transcoding[] };
   genre: string;
   waveform_url: string;
   comment_count: number;
@@ -21,6 +22,10 @@ export interface SongMetrics {
   permalink_url: string;
   permalink: string;
   id: number;
+  track_authorization: string;
+  media: {
+    transcodings: Transcoding[]; // used in https://api-v2.soundcloud.com/media/soundcloud:tracks:1317984667/b6705d26-a662-499e-8c4b-1e922b59475c/stream/hls
+  };
 }
 
 /** # Event handler - update text on changing
@@ -44,7 +49,8 @@ const urlSubmit = async (
   text: string,
   textSetter: React.Dispatch<React.SetStateAction<string>>,
   errorSetter: React.Dispatch<React.SetStateAction<string>>,
-  songMetricsSetter: React.Dispatch<React.SetStateAction<SongMetrics>>
+  songMetricsSetter: React.Dispatch<React.SetStateAction<SongMetrics>>,
+  songMetadataSetter: React.Dispatch<React.SetStateAction<SongResJson>>
 ) => {
   let validatedInput = text;
   // validate
@@ -54,8 +60,9 @@ const urlSubmit = async (
   }
 
   // submit
-  const songData = await getSongDisplayInfo(text);
+  const songData: SongResJson = await getSongDisplayInfo(text);
   songMetricsSetter(songData as SongMetrics);
+  songMetadataSetter(songData);
 
   // reset form
   textSetter("");
@@ -68,6 +75,7 @@ const example =
 /** Displays information about input to the fetch call
  */
 const SongInput: React.FC = () => {
+  const setSongMetadata = useHomeContext((s) => s.setSongMetadata);
   const setSongMetrics = useHomeContext((s) => s.setSongMetrics);
   const [textInput, setTextInput] = useState<string>(example);
   const [errorInput, setErrorInput] = useState<string>("");
@@ -81,7 +89,13 @@ const SongInput: React.FC = () => {
         onChange={onChangeUpdateText(setTextInput)}
         onKeyDown={(e: React.KeyboardEvent<HTMLDivElement>) => {
           if (e.key === "Enter")
-            urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics);
+            urlSubmit(
+              textInput,
+              setTextInput,
+              setErrorInput,
+              setSongMetrics,
+              setSongMetadata
+            );
         }}
         fullWidth
         error={errorInput !== ""}
@@ -93,7 +107,13 @@ const SongInput: React.FC = () => {
         fullWidth
         disableRipple
         onClick={() =>
-          urlSubmit(textInput, setTextInput, setErrorInput, setSongMetrics)
+          urlSubmit(
+            textInput,
+            setTextInput,
+            setErrorInput,
+            setSongMetrics,
+            setSongMetadata
+          )
         }
       >
         Submit

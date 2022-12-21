@@ -9,6 +9,9 @@ import SongInfo from "./SongInfo";
 import Embed from "./Embed";
 import { useLayoutEffect } from "react";
 import { AppStore, useAppContext } from "../../mobxApp";
+import { SongMetrics } from "./SongInput";
+import { SongResJson } from "../../scraping/SongMetadata";
+import { fetchMp3Url } from "../../scraping/fetchMp3";
 
 /** # Contains song info returned from the call by `<SongInput />`
  *
@@ -17,9 +20,17 @@ import { AppStore, useAppContext } from "../../mobxApp";
  * 1. Display an error occured while fetching - toast noti
  * 1. Show a list of previous queries (prob on the right side, vertical)
  * 1. Add embed element
+ *
+ * ## Loading BPM
+ * Once song data is fetched and loaded into `songMetrics` state, we need to:
+ * 1. Get the MP3 **file**
+ * 1. Run BPM algo on it
+ *
+ * That will be done here.
  */
 const SongDetailDisplay: React.FC<SProps> = () => {
   // state
+  const songMetrics: SongMetrics = useHomeContext((s) => s.songMetrics);
   const title: string = useHomeContext((s) => s.songMetrics.title);
   const setAnimateState: AppStore["setAnimateState"] = useAppContext(
     (s) => s.setAnimateState
@@ -27,6 +38,11 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   // effects
   useLayoutEffect(() => {
     title && setAnimateState("success, pending");
+
+    if (title) {
+      console.log("metrisc", songMetrics);
+      fetchMp3Url(songMetrics);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);
 
