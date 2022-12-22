@@ -1,10 +1,9 @@
 import { CLIENT_ID } from "../.main.env";
-import { calculateBPM } from "./bpmDetection";
-import { decodeAndAnalyzeBuffer_, processMp3 } from "./processAudio";
+import { SongAudio } from "./processAudio";
 import { SongMetrics, Transcoding } from "./SongMetadata";
 
-const apiV2BaseUrl = "https://api-v2.soundcloud.com";
-const mediaBaseUrl = "https://cf-hls-media.sndcdn.com";
+export const apiV2BaseUrl = "https://api-v2.soundcloud.com";
+export const mediaBaseUrl = "https://cf-hls-media.sndcdn.com";
 const desiredSampleRate = 44100;
 export const sampleRate = desiredSampleRate;
 
@@ -57,46 +56,54 @@ const fetchMp3Url = async (songMetadata: SongMetrics): Promise<string> => {
   return mp3Url;
 };
 
-const analyzeSongBPM_ = async (mp3Url: string) => {
-  // const request = buildRequest(mp3Url);
-  // audioCtx = audioCtx.createBufferSource();
-  // const audioCtx: AudioContext = new AudioContext({ sampleRate });
-  /** @todo convert to fetch? */
-  let req = new XMLHttpRequest();
-  req.open("GET", mp3Url, true);
-  console.log("mp3Url", mp3Url);
-  // req.responseType = "arraybuffer";
-  // req.onload = decodeAndAnalyzeBuffer_(audioCtx); // (audioCtx)
-  req.onload = decodeAndAnalyzeBuffer_; // (audioCtx)
-  await req.send();
-  // const audioBufferNode = audioCtx.createBufferSource();
-};
+// const analyzeSongBPM_ = async (mp3Url: string) => {
+//   // const request = buildRequest(mp3Url);
+//   // audioCtx = audioCtx.createBufferSource();
+//   // const audioCtx: AudioContext = new AudioContext({ sampleRate });
+//   /** @todo convert to fetch? */
+//   let req = new XMLHttpRequest();
+//   req.open("GET", mp3Url, true);
+//   console.log("mp3Url", mp3Url);
+//   // req.responseType = "arraybuffer";
+//   // req.onload = decodeAndAnalyzeBuffer_(audioCtx); // (audioCtx)
+//   req.onload = decodeAndAnalyzeBuffer_; // (audioCtx)
+//   await req.send();
+//   // const audioBufferNode = audioCtx.createBufferSource();
+// };
 
-const processMp3Slice = async (mp3Url: string) => {
-  const mp3Slice = await fetch(mp3Url);
-};
-/**
- * ## Get the mp3 file
+/** ## Get the song's BPM from its 'playlist' url.
+ * 1. Fetch the mp3 file from source
+ * 1. Preprocess it with Web Audio API
+ * 1. Calculate and return BPM
  */
 export const fetchMp3ProcessCalculateBpm = async (
+  audioCtx: AudioContext,
   songMetadata: SongMetrics
-): Promise<any> => {
+): Promise<SongAudio> => {
   // 1. fetch
   const mp3PlaylistUrl: string = await fetchMp3Url(songMetadata);
 
   // analyzeSongBPM_(mp3Url);
   // m3u file response - chunked song
   const m3uRes = await fetch(mp3PlaylistUrl);
-  console.log("mp3FileRes", m3uRes);
   const resTextLines = (await m3uRes.text()).split("\n");
+  const songAudio = new SongAudio();
+  songAudio.ctx = audioCtx;
 
-  // sorted by order in which they exist in the song
-  const mp3Urls = resTextLines.filter((line: string) => {
-    return line.includes(mediaBaseUrl);
-  });
+  // fetch and process song
+  await songAudio.fetchSongsFromM3u(resTextLines);
 
-  // NOW we fetch the mp3s
-  await processMp3Slice(mp3Urls[0]);
+  // songAudio.initOfflineCtx();
+
+  // songAudio.node?.start(0);
+  console.log(songAudio.node);
+  return songAudio;
+
+  // const bpmAnalyzer: BpmAnalyzer = Object.assign(new BpmAnalyzer(), songAudio);
+  // await bpmAnalyzer.initAudioRender();
+  // {...songAudio};
+
+  // begin analyzing bpm
 
   // console.log(await (await mp3FileRes.body)?.getReader())
   // process

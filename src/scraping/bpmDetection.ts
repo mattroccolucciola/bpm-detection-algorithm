@@ -1,4 +1,5 @@
 import { sampleRate } from "./fetchMp3";
+import { ISongAudio } from "./processAudio";
 // constants
 const tempoRange = { min: 80, max: 160 };
 
@@ -10,6 +11,33 @@ interface TempoCount {
   tempo: number;
   count: number;
 }
+
+/** ## Initiate audio analysis.
+ *
+ * This assumes that offline context and node are initialized.
+ *
+ * Second half of `decodeBuffer()`.
+ */
+// initAudioRender() {
+//   console.log("IM REND");
+//   const offlineCtx = this.offline?.ctx!;
+//   const offlineNode = this.offline?.node!;
+//   // offlineContext = this.offline?.ctx
+//   // offlineSource = this.offline?.node
+//   // create low-pass filter
+//   const filter = offlineCtx.createBiquadFilter()!;
+//   filter.frequency.value = 150;
+//   filter.type = "lowpass";
+//   offlineNode.connect(filter);
+//   filter.connect(offlineCtx.destination!);
+//   console.log("CONNETIN");
+//   offlineNode.start(0);
+//   console.log("PLAIN");
+//   // start the source playing
+//   offlineCtx.startRendering()!;
+// }
+
+// class BpmAnalyze extends ISongAudio {}
 
 const getPeaksAtThreshold = (
   buffer: Float32Array,

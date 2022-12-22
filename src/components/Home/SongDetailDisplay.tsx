@@ -7,11 +7,12 @@ import { SProps } from "../../mui/interfaces";
 // components
 import SongInfo from "./SongInfo";
 import Embed from "./Embed";
-import { useLayoutEffect } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { AppStore, useAppContext } from "../../mobxApp";
 import { SongMetrics } from "../../scraping/SongMetadata";
 import { fetchMp3ProcessCalculateBpm } from "../../scraping/fetchMp3";
-
+import { SongAudio } from "../../scraping/processAudio";
+const ac = new window.AudioContext();
 /** # Contains song info returned from the call by `<SongInput />`
  *
  * @todo:
@@ -34,19 +35,28 @@ const SongDetailDisplay: React.FC<SProps> = () => {
   const setAnimateState: AppStore["setAnimateState"] = useAppContext(
     (s) => s.setAnimateState
   );
+  const audioRef: React.MutableRefObject<AudioContext> = useRef(ac);
   // effects
   useLayoutEffect(() => {
     title && setAnimateState("success, pending");
 
+    const fetchData = async () => {
+      const songAudio: SongAudio = await fetchMp3ProcessCalculateBpm(
+        ac,
+        songMetrics
+      );
+      audioRef.current = songAudio.ctx!;
+    };
+
     if (title) {
       console.log("metrisc", songMetrics);
-      fetchMp3ProcessCalculateBpm(songMetrics);
+      fetchData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [title]);
 
   return title ? (
-    <Stack direction="column" component={Box} p={1}>
+    <Stack direction="column" component={Box} p={1} ref={audioRef}>
       <Embed />
       <SongInfo />
     </Stack>
