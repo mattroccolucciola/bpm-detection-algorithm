@@ -40,6 +40,69 @@ export class ISongAudio {
 
 export class SongAudio extends ISongAudio {
   slices: SongSlice[] = [];
+
+  oldCallbackFetchProcess(mp3PlaylistUrl: string) {
+    // build request
+    let req = new XMLHttpRequest();
+    req.open("GET", mp3PlaylistUrl, true);
+    // req.responseType = "arraybuffer";
+    // build request done
+
+    //
+    // const m3uRes = await fetch(mp3PlaylistUrl);
+    // const resTextLines = (await m3uRes.text()).split("\n");
+    const callbackDecodeAndAnalyzeBuffer = function (
+      this: XMLHttpRequest,
+      e: ProgressEvent<EventTarget>
+    ) {
+      const m3uRes = this.response;
+      const resTextLines = m3uRes.split("\n");
+      const slices: SongSlice[] = [];
+
+      for (let idx = 10; idx < resTextLines.length; idx++) {
+        const line = resTextLines[idx];
+        const isMp3Url = line.includes(mediaBaseUrl);
+        if (isMp3Url) {
+          // alias
+          const mp3Url = line;
+          console.log("mp3Url", mp3Url);
+
+          // get array+audio buffers from URL
+          const callbackFetchAudioBuffer = (mp3Url: string) => {
+            let length = 0;
+            let arrBufLen = 0;
+            // get from soundcloud
+            const mp3SliceRes: Response = await fetch(mp3Url);
+            // get the buffer directly from the res
+            const mp3SliceArrBuf: ArrayBuffer = await mp3SliceRes.arrayBuffer();
+            // decode that res buffer into a Web Audio API - compatible 'audio buffer'
+            // add to slice arr
+            this.slices.push(
+              new SongSlice(mp3Url, mp3SliceArrBuf, length!, arrBufLen!)
+            );
+
+            // update new buffer size (in bytes)
+            // this.length! += mp3SliceAudioBuf.length;
+            this.arrBufLen! += mp3SliceArrBuf.byteLength;
+          };
+          callbackFetchAudioBuffer(mp3Url);
+        }
+      }
+
+      // this.concatBuffers();
+      // this.ctx.decodeAudioData(
+      //   audioData,
+      //   decodeThenAnalyzeBuffer,
+      //   function (e) {
+      //     console.log("Error with decoding audio data" + e.err);
+      //   }
+      // );
+    };
+    req.onload = callbackDecodeAndAnalyzeBuffer;
+    req.send();
+    //
+  }
+
   async fetchSongsFromM3u(resTextLines: string[]) {
     // get song buffers by order in which they exist in the song, also get audio buffer size
     for (let idx = 10; idx < resTextLines.length; idx++) {

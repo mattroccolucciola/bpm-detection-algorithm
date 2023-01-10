@@ -83,20 +83,25 @@ export const fetchMp3ProcessCalculateBpm = async (
   // 1. fetch
   const mp3PlaylistUrl: string = await fetchMp3Url(songMetadata);
 
+  const songAudio = new SongAudio();
+  songAudio.ctx = audioCtx;
+
+  // this.oldCallbackFetchProcess() {}
+
   // analyzeSongBPM_(mp3Url);
   // m3u file response - chunked song
   const m3uRes = await fetch(mp3PlaylistUrl);
   const resTextLines = (await m3uRes.text()).split("\n");
-  const songAudio = new SongAudio();
-  songAudio.ctx = audioCtx;
 
   // fetch and process song
   await songAudio.fetchSongsFromM3u(resTextLines);
 
+  songAudio.oldCallbackFetchProcess(mp3PlaylistUrl);
+
   // songAudio.initOfflineCtx();
 
   // songAudio.node?.start(0);
-  console.log(songAudio.node);
+  // console.log(songAudio.node);
   return songAudio;
 
   // const bpmAnalyzer: BpmAnalyzer = Object.assign(new BpmAnalyzer(), songAudio);
